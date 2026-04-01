@@ -1,5 +1,7 @@
 using DeviceManagement.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using DeviceManagement.Application.Interfaces;
+using DeviceManagement.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +11,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<IDeviceService, DeviceService>();
 
 var app = builder.Build();
 
