@@ -9,9 +9,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DeviceManagement.Infrastructure;
+namespace DeviceManagement.Infrastructure.DependencyInjection;
 
-public static class DependencyInjection
+public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddDeviceManagementInfrastructure(
         this IServiceCollection services,

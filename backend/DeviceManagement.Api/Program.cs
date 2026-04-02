@@ -1,5 +1,5 @@
 using DeviceManagement.Api.Middleware;
-using DeviceManagement.Infrastructure;
+using DeviceManagement.Infrastructure.DependencyInjection;
 using DeviceManagement.Infrastructure.Data.Seed;
 
 var builder = WebApplication.CreateBuilder(args);
