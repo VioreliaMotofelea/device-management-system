@@ -1,6 +1,8 @@
+using DeviceManagement.Application.DeviceWrite;
 using DeviceManagement.Application.DTOs;
 using DeviceManagement.Application.Interfaces.Repositories;
 using DeviceManagement.Application.Interfaces.Services;
+using DeviceManagement.Application.Mapping;
 using DeviceManagement.Domain.Entities;
 
 namespace DeviceManagement.Infrastructure.Services;
@@ -17,70 +19,49 @@ public class DeviceService : IDeviceService
     public async Task<List<DeviceResponseDto>> GetAllAsync()
     {
         var devices = await _deviceRepository.GetAllAsync();
-
-        return devices.Select(MapToResponse).ToList();
+        return devices.Select(DeviceResponseMapper.ToDto).ToList();
     }
 
     public async Task<DeviceResponseDto?> GetByIdAsync(int id)
     {
         var device = await _deviceRepository.GetByIdAsync(id);
-
-        return device == null ? null : MapToResponse(device);
+        return device == null ? null : DeviceResponseMapper.ToDto(device);
     }
 
     public async Task<DeviceResponseDto> CreateAsync(CreateDeviceDto dto)
     {
-        ValidateCreateOrUpdate(dto);
+        var input = DeviceWriteInputParser.Parse(dto);
 
-        var exists = await _deviceRepository.ExistsAsync(dto.Name.Trim(), dto.Manufacturer.Trim());
+        var exists = await _deviceRepository.ExistsAsync(input.Name, input.Manufacturer);
         if (exists)
             throw new InvalidOperationException("A device with the same name and manufacturer already exists.");
 
-        var device = new Device
-        {
-            Name = dto.Name.Trim(),
-            Manufacturer = dto.Manufacturer.Trim(),
-            Type = dto.Type.Trim(),
-            OperatingSystem = dto.OperatingSystem.Trim(),
-            OsVersion = dto.OsVersion.Trim(),
-            Processor = dto.Processor.Trim(),
-            RamAmount = dto.RamAmount.Trim(),
-            Description = string.IsNullOrWhiteSpace(dto.Description) ? null : dto.Description.Trim(),
-            Location = dto.Location.Trim()
-        };
+        var device = MapToNewEntity(input);
 
         await _deviceRepository.AddAsync(device);
         await _deviceRepository.SaveChangesAsync();
 
-        return MapToResponse(device);
+        return DeviceResponseMapper.ToDto(device);
     }
 
     public async Task<DeviceResponseDto?> UpdateAsync(int id, UpdateDeviceDto dto)
     {
-        ValidateCreateOrUpdate(dto);
+        var input = DeviceWriteInputParser.Parse(dto);
 
         var device = await _deviceRepository.GetByIdAsync(id);
         if (device == null)
             return null;
 
-        var duplicate = await _deviceRepository.GetByNameAndManufacturerAsync(dto.Name.Trim(), dto.Manufacturer.Trim());
+        var duplicate = await _deviceRepository.GetByNameAndManufacturerAsync(input.Name, input.Manufacturer);
         if (duplicate != null && duplicate.Id != id)
             throw new InvalidOperationException("Another device with the same name and manufacturer already exists.");
 
-        device.Name = dto.Name.Trim();
-        device.Manufacturer = dto.Manufacturer.Trim();
-        device.Type = dto.Type.Trim();
-        device.OperatingSystem = dto.OperatingSystem.Trim();
-        device.OsVersion = dto.OsVersion.Trim();
-        device.Processor = dto.Processor.Trim();
-        device.RamAmount = dto.RamAmount.Trim();
-        device.Description = string.IsNullOrWhiteSpace(dto.Description) ? null : dto.Description.Trim();
-        device.Location = dto.Location.Trim();
+        ApplyInput(device, input);
 
         await _deviceRepository.UpdateAsync(device);
         await _deviceRepository.SaveChangesAsync();
 
-        return MapToResponse(device);
+        return DeviceResponseMapper.ToDto(device);
     }
 
     public async Task<bool> DeleteAsync(int id)
@@ -95,36 +76,32 @@ public class DeviceService : IDeviceService
         return true;
     }
 
-    private static void ValidateCreateOrUpdate(CreateDeviceDto dto)
+    private static Device MapToNewEntity(DeviceWriteInput input)
     {
-        if (string.IsNullOrWhiteSpace(dto.Name)) throw new ArgumentException("Name is required.");
-        if (string.IsNullOrWhiteSpace(dto.Manufacturer)) throw new ArgumentException("Manufacturer is required.");
-        if (string.IsNullOrWhiteSpace(dto.Type)) throw new ArgumentException("Type is required.");
-        if (string.IsNullOrWhiteSpace(dto.OperatingSystem)) throw new ArgumentException("Operating system is required.");
-        if (string.IsNullOrWhiteSpace(dto.OsVersion)) throw new ArgumentException("OS version is required.");
-        if (string.IsNullOrWhiteSpace(dto.Processor)) throw new ArgumentException("Processor is required.");
-        if (string.IsNullOrWhiteSpace(dto.RamAmount)) throw new ArgumentException("RAM amount is required.");
-        if (string.IsNullOrWhiteSpace(dto.Location)) throw new ArgumentException("Location is required.");
-
-        var normalizedType = dto.Type.Trim().ToLowerInvariant();
-        if (normalizedType != "phone" && normalizedType != "tablet")
-            throw new ArgumentException("Type must be either 'phone' or 'tablet'.");
+        return new Device
+        {
+            Name = input.Name,
+            Manufacturer = input.Manufacturer,
+            Type = input.Type,
+            OperatingSystem = input.OperatingSystem,
+            OsVersion = input.OsVersion,
+            Processor = input.Processor,
+            RamAmount = input.RamAmount,
+            Description = input.Description,
+            Location = input.Location
+        };
     }
 
-    private static DeviceResponseDto MapToResponse(Device device)
+    private static void ApplyInput(Device device, DeviceWriteInput input)
     {
-        return new DeviceResponseDto
-        {
-            Id = device.Id,
-            Name = device.Name,
-            Manufacturer = device.Manufacturer,
-            Type = device.Type,
-            OperatingSystem = device.OperatingSystem,
-            OsVersion = device.OsVersion,
-            Processor = device.Processor,
-            RamAmount = device.RamAmount,
-            Description = device.Description,
-            Location = device.Location
-        };
+        device.Name = input.Name;
+        device.Manufacturer = input.Manufacturer;
+        device.Type = input.Type;
+        device.OperatingSystem = input.OperatingSystem;
+        device.OsVersion = input.OsVersion;
+        device.Processor = input.Processor;
+        device.RamAmount = input.RamAmount;
+        device.Description = input.Description;
+        device.Location = input.Location;
     }
 }

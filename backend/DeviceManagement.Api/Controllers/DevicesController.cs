@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace DeviceManagement.Api.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/devices")]
 public class DevicesController : ControllerBase
 {
     private readonly IDeviceService _deviceService;
@@ -33,33 +33,29 @@ public class DevicesController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateDeviceDto dto)
-    {
-        try
+    public Task<IActionResult> Create([FromBody] CreateDeviceDto dto) =>
+        WriteAsync(async () =>
         {
             var created = await _deviceService.CreateAsync(dto);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
-        }
-        catch (ArgumentException ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return Conflict(new { message = ex.Message });
-        }
-    }
+        });
 
     [HttpPut("{id:int}")]
-    public async Task<IActionResult> Update(int id, [FromBody] UpdateDeviceDto dto)
-    {
-        try
+    public Task<IActionResult> Update(int id, [FromBody] UpdateDeviceDto dto) =>
+        WriteAsync(async () =>
         {
             var updated = await _deviceService.UpdateAsync(id, dto);
             if (updated == null)
                 return NotFound(new { message = $"Device with id {id} was not found." });
 
             return Ok(updated);
+        });
+
+    private async Task<IActionResult> WriteAsync(Func<Task<IActionResult>> action)
+    {
+        try
+        {
+            return await action();
         }
         catch (ArgumentException ex)
         {

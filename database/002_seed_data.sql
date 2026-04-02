@@ -10,7 +10,7 @@ GO
 
 IF NOT EXISTS (SELECT 1 FROM Devices WHERE Name = 'iPhone 14')
 BEGIN
-    INSERT INTO Devices (Name, Manufacturer, Type, OperatingSystem, OsVersion, Processor, RamAmount, Location)
-    VALUES ('iPhone 14', 'Apple', 'phone', 'iOS', '16', 'A15', '6GB', 'London');
+    INSERT INTO Devices (Name, Manufacturer, Type, OperatingSystem, OsVersion, Processor, RamAmount, Description, Location)
+    VALUES ('iPhone 14', 'Apple', 'phone', 'iOS', '16', 'A15', '6GB', 'Apple smartphone with A15 chip, 6GB RAM, iOS 16.', 'London');
 END
 GO

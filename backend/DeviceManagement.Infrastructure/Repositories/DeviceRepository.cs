@@ -16,17 +16,17 @@ public class DeviceRepository : IDeviceRepository
 
     public async Task<List<Device>> GetAllAsync()
     {
-        return await _context.Devices.ToListAsync();
+        return await _context.Devices.AsNoTracking().ToListAsync();
     }
 
     public async Task<Device?> GetByIdAsync(int id)
     {
-        return await _context.Devices.FirstOrDefaultAsync(d => d.Id == id);
+        return await _context.Devices.AsNoTracking().FirstOrDefaultAsync(d => d.Id == id);
     }
 
     public async Task<Device?> GetByNameAndManufacturerAsync(string name, string manufacturer)
     {
-        return await _context.Devices.FirstOrDefaultAsync(d =>
+        return await _context.Devices.AsNoTracking().FirstOrDefaultAsync(d =>
             d.Name == name && d.Manufacturer == manufacturer);
     }
 
@@ -49,7 +49,7 @@ public class DeviceRepository : IDeviceRepository
 
     public async Task<bool> ExistsAsync(string name, string manufacturer)
     {
-        return await _context.Devices.AnyAsync(d =>
+        return await _context.Devices.AsNoTracking().AnyAsync(d =>
             d.Name == name && d.Manufacturer == manufacturer);
     }
 
