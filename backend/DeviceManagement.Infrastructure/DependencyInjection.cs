@@ -1,8 +1,10 @@
 using DeviceManagement.Application.Interfaces.Repositories;
 using DeviceManagement.Application.Interfaces.Services;
+using DeviceManagement.Domain.Entities;
 using DeviceManagement.Infrastructure.Data;
 using DeviceManagement.Infrastructure.Repositories;
 using DeviceManagement.Infrastructure.Services;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,8 +22,12 @@ public static class DependencyInjection
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(connectionString));
 
+        services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
+
         services.AddScoped<IDeviceRepository, DeviceRepository>();
+        services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IDeviceService, DeviceService>();
+        services.AddScoped<IUserService, UserService>();
 
         return services;
     }

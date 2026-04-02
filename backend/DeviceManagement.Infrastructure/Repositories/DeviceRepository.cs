@@ -53,6 +53,12 @@ public class DeviceRepository : IDeviceRepository
             d.Name == name && d.Manufacturer == manufacturer);
     }
 
+    public async Task<bool> AnyAssignedToUserAsync(int userId)
+    {
+        return await _context.Devices.AsNoTracking()
+            .AnyAsync(d => d.AssignedUserId == userId);
+    }
+
     public async Task SaveChangesAsync()
     {
         await _context.SaveChangesAsync();

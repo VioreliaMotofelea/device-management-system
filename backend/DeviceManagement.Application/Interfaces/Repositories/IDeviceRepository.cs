@@ -11,5 +11,6 @@ public interface IDeviceRepository
     Task UpdateAsync(Device device);
     Task DeleteAsync(Device device);
     Task<bool> ExistsAsync(string name, string manufacturer);
+    Task<bool> AnyAssignedToUserAsync(int userId);
     Task SaveChangesAsync();
 }
