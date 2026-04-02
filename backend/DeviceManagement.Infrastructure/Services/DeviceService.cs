@@ -1,104 +1,130 @@
 using DeviceManagement.Application.DTOs;
-using DeviceManagement.Application.Interfaces;
+using DeviceManagement.Application.Interfaces.Repositories;
+using DeviceManagement.Application.Interfaces.Services;
 using DeviceManagement.Domain.Entities;
-using DeviceManagement.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace DeviceManagement.Infrastructure.Services;
 
 public class DeviceService : IDeviceService
 {
-    private readonly AppDbContext _context;
+    private readonly IDeviceRepository _deviceRepository;
 
-    public DeviceService(AppDbContext context)
+    public DeviceService(IDeviceRepository deviceRepository)
     {
-        _context = context;
+        _deviceRepository = deviceRepository;
     }
 
-    public async Task<List<DeviceDto>> GetAllAsync()
+    public async Task<List<DeviceResponseDto>> GetAllAsync()
     {
-        return await _context.Devices
-            .Select(d => new DeviceDto
-            {
-                Id = d.Id,
-                Name = d.Name,
-                Manufacturer = d.Manufacturer,
-                Type = d.Type,
-                OperatingSystem = d.OperatingSystem,
-                OsVersion = d.OsVersion,
-                Processor = d.Processor,
-                RamAmount = d.RamAmount,
-                Description = d.Description,
-                Location = d.Location
-            })
-            .ToListAsync();
+        var devices = await _deviceRepository.GetAllAsync();
+
+        return devices.Select(MapToResponse).ToList();
     }
 
-    public async Task<DeviceDto?> GetByIdAsync(int id)
+    public async Task<DeviceResponseDto?> GetByIdAsync(int id)
     {
-        var d = await _context.Devices.FindAsync(id);
-        if (d == null) return null;
+        var device = await _deviceRepository.GetByIdAsync(id);
 
-        return new DeviceDto
-        {
-            Id = d.Id,
-            Name = d.Name,
-            Manufacturer = d.Manufacturer,
-            Type = d.Type,
-            OperatingSystem = d.OperatingSystem,
-            OsVersion = d.OsVersion,
-            Processor = d.Processor,
-            RamAmount = d.RamAmount,
-            Description = d.Description,
-            Location = d.Location
-        };
+        return device == null ? null : MapToResponse(device);
     }
 
-    public async Task<DeviceDto> CreateAsync(CreateDeviceDto dto)
+    public async Task<DeviceResponseDto> CreateAsync(CreateDeviceDto dto)
     {
+        ValidateCreateOrUpdate(dto);
+
+        var exists = await _deviceRepository.ExistsAsync(dto.Name.Trim(), dto.Manufacturer.Trim());
+        if (exists)
+            throw new InvalidOperationException("A device with the same name and manufacturer already exists.");
+
         var device = new Device
         {
-            Name = dto.Name,
-            Manufacturer = dto.Manufacturer,
-            Type = dto.Type,
-            OperatingSystem = dto.OperatingSystem,
-            OsVersion = dto.OsVersion,
-            Processor = dto.Processor,
-            RamAmount = dto.RamAmount,
-            Location = dto.Location
+            Name = dto.Name.Trim(),
+            Manufacturer = dto.Manufacturer.Trim(),
+            Type = dto.Type.Trim(),
+            OperatingSystem = dto.OperatingSystem.Trim(),
+            OsVersion = dto.OsVersion.Trim(),
+            Processor = dto.Processor.Trim(),
+            RamAmount = dto.RamAmount.Trim(),
+            Description = string.IsNullOrWhiteSpace(dto.Description) ? null : dto.Description.Trim(),
+            Location = dto.Location.Trim()
         };
 
-        _context.Devices.Add(device);
-        await _context.SaveChangesAsync();
+        await _deviceRepository.AddAsync(device);
+        await _deviceRepository.SaveChangesAsync();
 
-        return await GetByIdAsync(device.Id)!;
+        return MapToResponse(device);
     }
 
-    public async Task<bool> UpdateAsync(int id, UpdateDeviceDto dto)
+    public async Task<DeviceResponseDto?> UpdateAsync(int id, UpdateDeviceDto dto)
     {
-        var device = await _context.Devices.FindAsync(id);
-        if (device == null) return false;
+        ValidateCreateOrUpdate(dto);
 
-        device.Name = dto.Name;
-        device.Manufacturer = dto.Manufacturer;
-        device.Type = dto.Type;
-        device.OperatingSystem = dto.OperatingSystem;
-        device.OsVersion = dto.OsVersion;
-        device.Processor = dto.Processor;
-        device.RamAmount = dto.RamAmount;
-        device.Location = dto.Location;
+        var device = await _deviceRepository.GetByIdAsync(id);
+        if (device == null)
+            return null;
 
-        await _context.SaveChangesAsync();
-        return true;
+        var duplicate = await _deviceRepository.GetByNameAndManufacturerAsync(dto.Name.Trim(), dto.Manufacturer.Trim());
+        if (duplicate != null && duplicate.Id != id)
+            throw new InvalidOperationException("Another device with the same name and manufacturer already exists.");
+
+        device.Name = dto.Name.Trim();
+        device.Manufacturer = dto.Manufacturer.Trim();
+        device.Type = dto.Type.Trim();
+        device.OperatingSystem = dto.OperatingSystem.Trim();
+        device.OsVersion = dto.OsVersion.Trim();
+        device.Processor = dto.Processor.Trim();
+        device.RamAmount = dto.RamAmount.Trim();
+        device.Description = string.IsNullOrWhiteSpace(dto.Description) ? null : dto.Description.Trim();
+        device.Location = dto.Location.Trim();
+
+        await _deviceRepository.UpdateAsync(device);
+        await _deviceRepository.SaveChangesAsync();
+
+        return MapToResponse(device);
     }
 
     public async Task<bool> DeleteAsync(int id)
     {
-        var device = await _context.Devices.FindAsync(id);
-        if (device == null) return false;
+        var device = await _deviceRepository.GetByIdAsync(id);
+        if (device == null)
+            return false;
 
-        _context.Devices.Remove(device);
-        await _context.SaveChangesAsync();
+        await _deviceRepository.DeleteAsync(device);
+        await _deviceRepository.SaveChangesAsync();
+
         return true;
+    }
+
+    private static void ValidateCreateOrUpdate(CreateDeviceDto dto)
+    {
+        if (string.IsNullOrWhiteSpace(dto.Name)) throw new ArgumentException("Name is required.");
+        if (string.IsNullOrWhiteSpace(dto.Manufacturer)) throw new ArgumentException("Manufacturer is required.");
+        if (string.IsNullOrWhiteSpace(dto.Type)) throw new ArgumentException("Type is required.");
+        if (string.IsNullOrWhiteSpace(dto.OperatingSystem)) throw new ArgumentException("Operating system is required.");
+        if (string.IsNullOrWhiteSpace(dto.OsVersion)) throw new ArgumentException("OS version is required.");
+        if (string.IsNullOrWhiteSpace(dto.Processor)) throw new ArgumentException("Processor is required.");
+        if (string.IsNullOrWhiteSpace(dto.RamAmount)) throw new ArgumentException("RAM amount is required.");
+        if (string.IsNullOrWhiteSpace(dto.Location)) throw new ArgumentException("Location is required.");
+
+        var normalizedType = dto.Type.Trim().ToLowerInvariant();
+        if (normalizedType != "phone" && normalizedType != "tablet")
+            throw new ArgumentException("Type must be either 'phone' or 'tablet'.");
+    }
+
+    private static DeviceResponseDto MapToResponse(Device device)
+    {
+        return new DeviceResponseDto
+        {
+            Id = device.Id,
+            Name = device.Name,
+            Manufacturer = device.Manufacturer,
+            Type = device.Type,
+            OperatingSystem = device.OperatingSystem,
+            OsVersion = device.OsVersion,
+            Processor = device.Processor,
+            RamAmount = device.RamAmount,
+            Description = device.Description,
+            Location = device.Location
+        };
     }
 }

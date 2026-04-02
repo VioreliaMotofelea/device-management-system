@@ -9,5 +9,6 @@ public class CreateDeviceDto
     public string OsVersion { get; set; } = null!;
     public string Processor { get; set; } = null!;
     public string RamAmount { get; set; } = null!;
+    public string? Description { get; set; }
     public string Location { get; set; } = null!;
 }

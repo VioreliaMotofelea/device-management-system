@@ -1,5 +1,5 @@
 using DeviceManagement.Application.DTOs;
-using DeviceManagement.Application.Interfaces;
+using DeviceManagement.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DeviceManagement.Api.Controllers;
@@ -8,47 +8,76 @@ namespace DeviceManagement.Api.Controllers;
 [Route("api/[controller]")]
 public class DevicesController : ControllerBase
 {
-    private readonly IDeviceService _service;
+    private readonly IDeviceService _deviceService;
 
-    public DevicesController(IDeviceService service)
+    public DevicesController(IDeviceService deviceService)
     {
-        _service = service;
+        _deviceService = deviceService;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
-        return Ok(await _service.GetAllAsync());
+        var devices = await _deviceService.GetAllAsync();
+        return Ok(devices);
     }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> Get(int id)
+    [HttpGet("{id:int}")]
+    public async Task<IActionResult> GetById(int id)
     {
-        var device = await _service.GetByIdAsync(id);
-        if (device == null) return NotFound();
+        var device = await _deviceService.GetByIdAsync(id);
+        if (device == null)
+            return NotFound(new { message = $"Device with id {id} was not found." });
+
         return Ok(device);
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create(CreateDeviceDto dto)
+    public async Task<IActionResult> Create([FromBody] CreateDeviceDto dto)
     {
-        var device = await _service.CreateAsync(dto);
-        return CreatedAtAction(nameof(Get), new { id = device.Id }, device);
+        try
+        {
+            var created = await _deviceService.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
     }
 
-    [HttpPut("{id}")]
-    public async Task<IActionResult> Update(int id, UpdateDeviceDto dto)
+    [HttpPut("{id:int}")]
+    public async Task<IActionResult> Update(int id, [FromBody] UpdateDeviceDto dto)
     {
-        var result = await _service.UpdateAsync(id, dto);
-        if (!result) return NotFound();
-        return NoContent();
+        try
+        {
+            var updated = await _deviceService.UpdateAsync(id, dto);
+            if (updated == null)
+                return NotFound(new { message = $"Device with id {id} was not found." });
+
+            return Ok(updated);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Conflict(new { message = ex.Message });
+        }
     }
 
-    [HttpDelete("{id}")]
+    [HttpDelete("{id:int}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var result = await _service.DeleteAsync(id);
-        if (!result) return NotFound();
+        var deleted = await _deviceService.DeleteAsync(id);
+        if (!deleted)
+            return NotFound(new { message = $"Device with id {id} was not found." });
+
         return NoContent();
     }
 }
