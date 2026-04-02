@@ -1,5 +1,6 @@
 using DeviceManagement.Application.DeviceWrite;
 using DeviceManagement.Application.DTOs;
+using DeviceManagement.Application.Exceptions;
 using DeviceManagement.Application.Interfaces.Repositories;
 using DeviceManagement.Application.Interfaces.Services;
 using DeviceManagement.Application.Mapping;
@@ -22,10 +23,13 @@ public class DeviceService : IDeviceService
         return devices.Select(DeviceResponseMapper.ToDto).ToList();
     }
 
-    public async Task<DeviceResponseDto?> GetByIdAsync(int id)
+    public async Task<DeviceResponseDto> GetByIdAsync(int id)
     {
         var device = await _deviceRepository.GetByIdAsync(id);
-        return device == null ? null : DeviceResponseMapper.ToDto(device);
+        if (device == null)
+            throw new NotFoundException($"Device with id {id} was not found.");
+
+        return DeviceResponseMapper.ToDto(device);
     }
 
     public async Task<DeviceResponseDto> CreateAsync(CreateDeviceDto dto)
@@ -34,7 +38,7 @@ public class DeviceService : IDeviceService
 
         var exists = await _deviceRepository.ExistsAsync(input.Name, input.Manufacturer);
         if (exists)
-            throw new InvalidOperationException("A device with the same name and manufacturer already exists.");
+            throw new ConflictException("A device with the same name and manufacturer already exists.");
 
         var device = MapToNewEntity(input);
 
@@ -44,17 +48,17 @@ public class DeviceService : IDeviceService
         return DeviceResponseMapper.ToDto(device);
     }
 
-    public async Task<DeviceResponseDto?> UpdateAsync(int id, UpdateDeviceDto dto)
+    public async Task<DeviceResponseDto> UpdateAsync(int id, UpdateDeviceDto dto)
     {
         var input = DeviceWriteInputParser.Parse(dto);
 
         var device = await _deviceRepository.GetByIdAsync(id);
         if (device == null)
-            return null;
+            throw new NotFoundException($"Device with id {id} was not found.");
 
         var duplicate = await _deviceRepository.GetByNameAndManufacturerAsync(input.Name, input.Manufacturer);
         if (duplicate != null && duplicate.Id != id)
-            throw new InvalidOperationException("Another device with the same name and manufacturer already exists.");
+            throw new ConflictException("Another device with the same name and manufacturer already exists.");
 
         ApplyInput(device, input);
 
@@ -64,16 +68,14 @@ public class DeviceService : IDeviceService
         return DeviceResponseMapper.ToDto(device);
     }
 
-    public async Task<bool> DeleteAsync(int id)
+    public async Task DeleteAsync(int id)
     {
         var device = await _deviceRepository.GetByIdAsync(id);
         if (device == null)
-            return false;
+            throw new NotFoundException($"Device with id {id} was not found.");
 
         await _deviceRepository.DeleteAsync(device);
         await _deviceRepository.SaveChangesAsync();
-
-        return true;
     }
 
     private static Device MapToNewEntity(DeviceWriteInput input)

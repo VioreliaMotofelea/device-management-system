@@ -1,3 +1,4 @@
+using DeviceManagement.Api.Middleware;
 using DeviceManagement.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,6 +18,8 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
+
+app.UseGlobalExceptionHandler();
 
 app.UseAuthorization();
 
