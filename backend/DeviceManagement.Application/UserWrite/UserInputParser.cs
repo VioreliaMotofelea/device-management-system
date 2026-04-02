@@ -1,4 +1,4 @@
-using DeviceManagement.Application.DTOs;
+using DeviceManagement.Application.DTOs.Users;
 using DeviceManagement.Application.Exceptions;
 
 namespace DeviceManagement.Application.UserWrite;

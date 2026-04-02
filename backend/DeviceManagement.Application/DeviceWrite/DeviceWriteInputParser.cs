@@ -1,4 +1,4 @@
-using DeviceManagement.Application.DTOs;
+using DeviceManagement.Application.DTOs.Devices;
 using DeviceManagement.Application.Exceptions;
 using DeviceManagement.Domain.Constants;
 

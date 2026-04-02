@@ -1,4 +1,4 @@
-using DeviceManagement.Application.DTOs;
+using DeviceManagement.Application.DTOs.Users;
 
 namespace DeviceManagement.Application.Interfaces.Services;
 

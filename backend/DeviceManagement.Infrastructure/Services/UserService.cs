@@ -1,4 +1,4 @@
-using DeviceManagement.Application.DTOs;
+using DeviceManagement.Application.DTOs.Users;
 using DeviceManagement.Application.Exceptions;
 using DeviceManagement.Application.Interfaces.Repositories;
 using DeviceManagement.Application.Interfaces.Services;

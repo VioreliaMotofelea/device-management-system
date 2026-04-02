@@ -1,5 +1,5 @@
 using DeviceManagement.Application.DeviceWrite;
-using DeviceManagement.Application.DTOs;
+using DeviceManagement.Application.DTOs.Devices;
 using DeviceManagement.Application.Exceptions;
 using DeviceManagement.Application.Interfaces.Repositories;
 using DeviceManagement.Application.Interfaces.Services;

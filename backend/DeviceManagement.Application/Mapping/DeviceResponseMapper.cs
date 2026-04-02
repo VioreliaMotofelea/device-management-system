@@ -1,4 +1,4 @@
-using DeviceManagement.Application.DTOs;
+using DeviceManagement.Application.DTOs.Devices;
 using DeviceManagement.Domain.Entities;
 
 namespace DeviceManagement.Application.Mapping;

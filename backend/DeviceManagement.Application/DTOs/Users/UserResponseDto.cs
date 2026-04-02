@@ -1,4 +1,4 @@
-namespace DeviceManagement.Application.DTOs;
+namespace DeviceManagement.Application.DTOs.Users;
 
 public class UserResponseDto
 {

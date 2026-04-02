@@ -1,4 +1,4 @@
-using DeviceManagement.Application.DTOs;
+using DeviceManagement.Application.DTOs.Devices;
 using DeviceManagement.Application.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
 
