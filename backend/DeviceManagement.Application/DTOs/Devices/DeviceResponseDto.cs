@@ -12,4 +12,6 @@ public class DeviceResponseDto
     public string RamAmount { get; set; } = null!;
     public string? Description { get; set; }
     public string Location { get; set; } = null!;
+    public int? AssignedUserId { get; set; }
+    public string? AssignedUserName { get; set; }
 }
