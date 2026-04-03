@@ -1,104 +1,109 @@
-using DeviceManagement.Application.DTOs;
-using DeviceManagement.Application.Interfaces;
+using DeviceManagement.Application.DeviceWrite;
+using DeviceManagement.Application.DTOs.Devices;
+using DeviceManagement.Application.Exceptions;
+using DeviceManagement.Application.Interfaces.Repositories;
+using DeviceManagement.Application.Interfaces.Services;
+using DeviceManagement.Application.Mapping;
 using DeviceManagement.Domain.Entities;
-using DeviceManagement.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
 
 namespace DeviceManagement.Infrastructure.Services;
 
 public class DeviceService : IDeviceService
 {
-    private readonly AppDbContext _context;
+    private readonly IDeviceRepository _deviceRepository;
 
-    public DeviceService(AppDbContext context)
+    public DeviceService(IDeviceRepository deviceRepository)
     {
-        _context = context;
+        _deviceRepository = deviceRepository;
     }
 
-    public async Task<List<DeviceDto>> GetAllAsync()
+    public async Task<List<DeviceResponseDto>> GetAllAsync()
     {
-        return await _context.Devices
-            .Select(d => new DeviceDto
-            {
-                Id = d.Id,
-                Name = d.Name,
-                Manufacturer = d.Manufacturer,
-                Type = d.Type,
-                OperatingSystem = d.OperatingSystem,
-                OsVersion = d.OsVersion,
-                Processor = d.Processor,
-                RamAmount = d.RamAmount,
-                Description = d.Description,
-                Location = d.Location
-            })
-            .ToListAsync();
+        var devices = await _deviceRepository.GetAllAsync();
+        return devices.Select(DeviceResponseMapper.ToDto).ToList();
     }
 
-    public async Task<DeviceDto?> GetByIdAsync(int id)
+    public async Task<DeviceResponseDto> GetByIdAsync(int id)
     {
-        var d = await _context.Devices.FindAsync(id);
-        if (d == null) return null;
+        var device = await _deviceRepository.GetByIdAsync(id);
+        if (device == null)
+            throw new NotFoundException($"Device with id {id} was not found.");
 
-        return new DeviceDto
+        return DeviceResponseMapper.ToDto(device);
+    }
+
+    public async Task<DeviceResponseDto> CreateAsync(CreateDeviceDto dto)
+    {
+        var input = DeviceWriteInputParser.Parse(dto);
+
+        var exists = await _deviceRepository.ExistsAsync(input.Name, input.Manufacturer);
+        if (exists)
+            throw new ConflictException("A device with the same name and manufacturer already exists.");
+
+        var device = MapToNewEntity(input);
+
+        await _deviceRepository.AddAsync(device);
+        await _deviceRepository.SaveChangesAsync();
+
+        return DeviceResponseMapper.ToDto(device);
+    }
+
+    public async Task<DeviceResponseDto> UpdateAsync(int id, UpdateDeviceDto dto)
+    {
+        var input = DeviceWriteInputParser.Parse(dto);
+
+        var device = await _deviceRepository.GetByIdAsync(id);
+        if (device == null)
+            throw new NotFoundException($"Device with id {id} was not found.");
+
+        var duplicate = await _deviceRepository.GetByNameAndManufacturerAsync(input.Name, input.Manufacturer);
+        if (duplicate != null && duplicate.Id != id)
+            throw new ConflictException("Another device with the same name and manufacturer already exists.");
+
+        ApplyInput(device, input);
+
+        await _deviceRepository.UpdateAsync(device);
+        await _deviceRepository.SaveChangesAsync();
+
+        return DeviceResponseMapper.ToDto(device);
+    }
+
+    public async Task DeleteAsync(int id)
+    {
+        var device = await _deviceRepository.GetByIdAsync(id);
+        if (device == null)
+            throw new NotFoundException($"Device with id {id} was not found.");
+
+        await _deviceRepository.DeleteAsync(device);
+        await _deviceRepository.SaveChangesAsync();
+    }
+
+    private static Device MapToNewEntity(DeviceWriteInput input)
+    {
+        return new Device
         {
-            Id = d.Id,
-            Name = d.Name,
-            Manufacturer = d.Manufacturer,
-            Type = d.Type,
-            OperatingSystem = d.OperatingSystem,
-            OsVersion = d.OsVersion,
-            Processor = d.Processor,
-            RamAmount = d.RamAmount,
-            Description = d.Description,
-            Location = d.Location
+            Name = input.Name,
+            Manufacturer = input.Manufacturer,
+            Type = input.Type,
+            OperatingSystem = input.OperatingSystem,
+            OsVersion = input.OsVersion,
+            Processor = input.Processor,
+            RamAmount = input.RamAmount,
+            Description = input.Description,
+            Location = input.Location
         };
     }
 
-    public async Task<DeviceDto> CreateAsync(CreateDeviceDto dto)
+    private static void ApplyInput(Device device, DeviceWriteInput input)
     {
-        var device = new Device
-        {
-            Name = dto.Name,
-            Manufacturer = dto.Manufacturer,
-            Type = dto.Type,
-            OperatingSystem = dto.OperatingSystem,
-            OsVersion = dto.OsVersion,
-            Processor = dto.Processor,
-            RamAmount = dto.RamAmount,
-            Location = dto.Location
-        };
-
-        _context.Devices.Add(device);
-        await _context.SaveChangesAsync();
-
-        return await GetByIdAsync(device.Id)!;
-    }
-
-    public async Task<bool> UpdateAsync(int id, UpdateDeviceDto dto)
-    {
-        var device = await _context.Devices.FindAsync(id);
-        if (device == null) return false;
-
-        device.Name = dto.Name;
-        device.Manufacturer = dto.Manufacturer;
-        device.Type = dto.Type;
-        device.OperatingSystem = dto.OperatingSystem;
-        device.OsVersion = dto.OsVersion;
-        device.Processor = dto.Processor;
-        device.RamAmount = dto.RamAmount;
-        device.Location = dto.Location;
-
-        await _context.SaveChangesAsync();
-        return true;
-    }
-
-    public async Task<bool> DeleteAsync(int id)
-    {
-        var device = await _context.Devices.FindAsync(id);
-        if (device == null) return false;
-
-        _context.Devices.Remove(device);
-        await _context.SaveChangesAsync();
-        return true;
+        device.Name = input.Name;
+        device.Manufacturer = input.Manufacturer;
+        device.Type = input.Type;
+        device.OperatingSystem = input.OperatingSystem;
+        device.OsVersion = input.OsVersion;
+        device.Processor = input.Processor;
+        device.RamAmount = input.RamAmount;
+        device.Description = input.Description;
+        device.Location = input.Location;
     }
 }

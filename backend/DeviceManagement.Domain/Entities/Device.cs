@@ -13,4 +13,5 @@ public class Device
     public string? Description { get; set; }
     public string Location { get; set; } = null!;
     public int? AssignedUserId { get; set; }
+    public User? AssignedUser { get; set; }
 }

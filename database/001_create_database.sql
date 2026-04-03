@@ -15,8 +15,7 @@ BEGIN
         PasswordHash NVARCHAR(500) NOT NULL,
         FullName NVARCHAR(255) NOT NULL,
         Role NVARCHAR(100) NOT NULL,
-        Location NVARCHAR(255) NOT NULL,
-        CreatedAt DATETIME2 DEFAULT GETUTCDATE()
+        Location NVARCHAR(255) NOT NULL
     );
 END
 GO

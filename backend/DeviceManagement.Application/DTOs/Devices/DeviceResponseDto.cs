@@ -1,6 +1,6 @@
-namespace DeviceManagement.Application.DTOs;
+namespace DeviceManagement.Application.DTOs.Devices;
 
-public class DeviceDto
+public class DeviceResponseDto
 {
     public int Id { get; set; }
     public string Name { get; set; } = null!;
