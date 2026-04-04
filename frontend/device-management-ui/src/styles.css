@@ -1,1 +1,31 @@
-/* You can add global styles to this file, and also import other style files */
+:root {
+  --dm-text: #0f172a;
+  --dm-muted: #64748b;
+  --dm-border: #e2e8f0;
+  --dm-bg-subtle: #f8fafc;
+  --dm-surface: #ffffff;
+  --dm-primary: #2563eb;
+  --dm-focus: #93c5fd;
+  --dm-radius: 12px;
+  --dm-shadow: 0 1px 3px rgb(15 23 42 / 8%);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    Helvetica,
+    Arial,
+    sans-serif;
+  color: var(--dm-text);
+  background: var(--dm-bg-subtle);
+}
