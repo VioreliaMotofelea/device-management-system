@@ -18,7 +18,9 @@ public static class DeviceResponseMapper
             Processor = device.Processor,
             RamAmount = device.RamAmount,
             Description = device.Description,
-            Location = device.Location
+            Location = device.Location,
+            AssignedUserId = device.AssignedUserId,
+            AssignedUserName = device.AssignedUser?.FullName
         };
     }
 }

@@ -1,0 +1,73 @@
+<section class="panel">
+  <div class="panel-head">
+    <h1>Devices</h1>
+    <button type="button" class="ghost-btn" (click)="refresh()" [disabled]="loading()">
+      Refresh
+    </button>
+  </div>
+
+  <p class="lede">
+    Assign a device to yourself if it is free, or unassign one that is yours.
+    (Full create/edit/delete flows come in Phase 2.)
+  </p>
+
+  @if (actionError(); as ae) {
+    <div class="banner warn" role="alert">{{ ae }}</div>
+  }
+
+  @if (listError(); as le) {
+    <div class="banner err" role="alert">{{ le }}</div>
+  } @else if (loading()) {
+    <p class="muted">Loading…</p>
+  } @else if (devices().length === 0) {
+    <p class="muted">No devices yet.</p>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Manufacturer</th>
+            <th>Type</th>
+            <th>Assigned to</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (d of devices(); track d.id) {
+            <tr>
+              <td>{{ d.name }}</td>
+              <td>{{ d.manufacturer }}</td>
+              <td>{{ d.type }}</td>
+              <td>
+                @if (d.assignedUserName) {
+                  {{ d.assignedUserName }}
+                } @else {
+                  <span class="muted">—</span>
+                }
+              </td>
+              <td class="actions">
+                <button
+                  type="button"
+                  class="linkish"
+                  [disabled]="!canAssign(d) || busyId() === d.id"
+                  (click)="assign(d.id)"
+                >
+                  {{ busyId() === d.id ? '…' : 'Assign to me' }}
+                </button>
+                <button
+                  type="button"
+                  class="linkish danger"
+                  [disabled]="!canUnassign(d) || busyId() === d.id"
+                  (click)="unassign(d.id)"
+                >
+                  Unassign
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

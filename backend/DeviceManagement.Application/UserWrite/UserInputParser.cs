@@ -1,12 +1,12 @@
+using DeviceManagement.Application.Common;
 using DeviceManagement.Application.DTOs.Users;
 using DeviceManagement.Application.Exceptions;
+using DeviceManagement.Application.Validation;
 
 namespace DeviceManagement.Application.UserWrite;
 
 public static class UserInputParser
 {
-    private const int MinPasswordLength = 6;
-
     public static CreateUserWriteInput ParseCreate(CreateUserDto dto)
     {
         if (dto is null)
@@ -16,8 +16,8 @@ public static class UserInputParser
             throw new ValidationException("Email is required.");
         if (string.IsNullOrWhiteSpace(dto.Password))
             throw new ValidationException("Password is required.");
-        if (dto.Password.Length < MinPasswordLength)
-            throw new ValidationException($"Password must be at least {MinPasswordLength} characters.");
+        if (dto.Password.Length < ValidationConstants.MinPasswordLength)
+            throw new ValidationException($"Password must be at least {ValidationConstants.MinPasswordLength} characters.");
         if (string.IsNullOrWhiteSpace(dto.Name))
             throw new ValidationException("Name is required.");
         if (string.IsNullOrWhiteSpace(dto.Role))
@@ -25,7 +25,7 @@ public static class UserInputParser
         if (string.IsNullOrWhiteSpace(dto.Location))
             throw new ValidationException("Location is required.");
 
-        var email = NormalizeEmail(dto.Email);
+        var email = EmailNormalizer.Normalize(dto.Email);
 
         return new CreateUserWriteInput(
             email,
@@ -49,11 +49,11 @@ public static class UserInputParser
         if (string.IsNullOrWhiteSpace(dto.Location))
             throw new ValidationException("Location is required.");
 
-        var email = NormalizeEmail(dto.Email);
+        var email = EmailNormalizer.Normalize(dto.Email);
 
         string? password = string.IsNullOrWhiteSpace(dto.Password) ? null : dto.Password;
-        if (password is not null && password.Length < MinPasswordLength)
-            throw new ValidationException($"Password must be at least {MinPasswordLength} characters.");
+        if (password is not null && password.Length < ValidationConstants.MinPasswordLength)
+            throw new ValidationException($"Password must be at least {ValidationConstants.MinPasswordLength} characters.");
 
         return new UpdateUserWriteInput(
             email,
@@ -61,22 +61,5 @@ public static class UserInputParser
             dto.Name.Trim(),
             dto.Role.Trim(),
             dto.Location.Trim());
-    }
-
-    private static string NormalizeEmail(string email)
-    {
-        var trimmed = email.Trim();
-        if (trimmed.Length == 0)
-            throw new ValidationException("Email is required.");
-
-        var at = trimmed.IndexOf('@');
-        if (at <= 0 || at == trimmed.Length - 1 || trimmed.IndexOf('@', at + 1) >= 0)
-            throw new ValidationException("Email format is invalid.");
-
-        var domain = trimmed[(at + 1)..];
-        if (!domain.Contains('.'))
-            throw new ValidationException("Email format is invalid.");
-
-        return trimmed.ToLowerInvariant();
     }
 }

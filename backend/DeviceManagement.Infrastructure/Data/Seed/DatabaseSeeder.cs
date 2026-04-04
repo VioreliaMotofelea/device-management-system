@@ -7,7 +7,7 @@ namespace DeviceManagement.Infrastructure.Data.Seed;
 public sealed class DatabaseSeeder
 {
     public const string DemoUserEmail = "test@user.com";
-    private const string DemoUserPassword = "Password1";
+    public const string DemoUserPassword = "Password1";
     private const string DemoDeviceName = "iPhone 14";
 
     private readonly AppDbContext _db;

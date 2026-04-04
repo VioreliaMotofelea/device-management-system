@@ -1,18 +1,23 @@
+using DeviceManagement.Api.Extensions;
 using DeviceManagement.Application.DTOs.Devices;
 using DeviceManagement.Application.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DeviceManagement.Api.Controllers;
 
 [ApiController]
 [Route("api/devices")]
+[Authorize]
 public class DevicesController : ControllerBase
 {
     private readonly IDeviceService _deviceService;
+    private readonly IDeviceAssignmentService _assignmentService;
 
-    public DevicesController(IDeviceService deviceService)
+    public DevicesController(IDeviceService deviceService, IDeviceAssignmentService assignmentService)
     {
         _deviceService = deviceService;
+        _assignmentService = assignmentService;
     }
 
     [HttpGet]
@@ -48,5 +53,21 @@ public class DevicesController : ControllerBase
     {
         await _deviceService.DeleteAsync(id);
         return NoContent();
+    }
+
+    [HttpPost("{id:int}/assign")]
+    public async Task<IActionResult> Assign(int id)
+    {
+        var userId = User.GetRequiredUserId();
+        var device = await _assignmentService.AssignToCurrentUserAsync(id, userId);
+        return Ok(device);
+    }
+
+    [HttpPost("{id:int}/unassign")]
+    public async Task<IActionResult> Unassign(int id)
+    {
+        var userId = User.GetRequiredUserId();
+        var device = await _assignmentService.UnassignFromCurrentUserAsync(id, userId);
+        return Ok(device);
     }
 }
