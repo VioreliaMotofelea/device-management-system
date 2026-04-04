@@ -1,0 +1,126 @@
+@import './device-list.component.css';
+
+.head-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.ghost-link {
+  font-size: 0.9rem;
+  color: var(--dm-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.ghost-link:hover {
+  text-decoration: underline;
+}
+
+.btn-secondary {
+  display: inline-block;
+  padding: 0.4rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid var(--dm-border);
+  background: var(--dm-surface);
+  color: var(--dm-text);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.btn-secondary:hover {
+  background: var(--dm-bg-subtle);
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: minmax(8rem, 11rem) 1fr;
+  gap: 0.65rem 1.25rem;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 540px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  dt {
+    color: var(--dm-muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin-top: 0.5rem;
+  }
+
+  dt:first-child {
+    margin-top: 0;
+  }
+}
+
+dt {
+  margin: 0;
+  font-weight: 600;
+  color: var(--dm-muted);
+}
+
+dd {
+  margin: 0;
+}
+
+.description {
+  grid-column: 1 / -1;
+  white-space: pre-wrap;
+  line-height: 1.45;
+}
+
+@media (min-width: 541px) {
+  .description {
+    grid-column: 2;
+  }
+}
+
+.assign-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--dm-border);
+}
+
+.primary {
+  padding: 0.55rem 1rem;
+  border: none;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  background: var(--dm-primary);
+  color: #fff;
+}
+
+.primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-danger {
+  padding: 0.55rem 1rem;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  background: #fff;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.btn-danger:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  color: var(--dm-muted);
+  border-color: var(--dm-border);
+}

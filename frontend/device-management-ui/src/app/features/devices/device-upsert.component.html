@@ -1,0 +1,102 @@
+<section class="panel">
+  <div class="panel-head">
+    <h1>{{ isEdit() ? 'Edit device' : 'Add device' }}</h1>
+    <a routerLink="/devices" class="ghost-link">Back to list</a>
+  </div>
+
+  @if (loadError(); as le) {
+    <div class="banner err" role="alert">{{ le }}</div>
+  } @else if (loading()) {
+    <p class="muted">Loading…</p>
+  } @else {
+    @if (submitError(); as se) {
+      <div class="banner err" role="alert">{{ se }}</div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="form-grid">
+      <label class="field">
+        <span>Name</span>
+        <input type="text" formControlName="name" autocomplete="off" />
+        @if (form.controls.name.touched && form.controls.name.invalid) {
+          <span class="field-error">Required.</span>
+        }
+      </label>
+
+      <label class="field">
+        <span>Manufacturer</span>
+        <input type="text" formControlName="manufacturer" autocomplete="off" />
+        @if (form.controls.manufacturer.touched && form.controls.manufacturer.invalid) {
+          <span class="field-error">Required.</span>
+        }
+      </label>
+
+      <label class="field">
+        <span>Type</span>
+        <select formControlName="type">
+          @for (t of typeOptions; track t) {
+            <option [value]="t">{{ t }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="field">
+        <span>Operating system</span>
+        <input type="text" formControlName="operatingSystem" autocomplete="off" />
+        @if (form.controls.operatingSystem.touched && form.controls.operatingSystem.invalid) {
+          <span class="field-error">Required.</span>
+        }
+      </label>
+
+      <label class="field">
+        <span>OS version</span>
+        <input type="text" formControlName="osVersion" autocomplete="off" />
+        @if (form.controls.osVersion.touched && form.controls.osVersion.invalid) {
+          <span class="field-error">Required.</span>
+        }
+      </label>
+
+      <label class="field">
+        <span>Processor</span>
+        <input type="text" formControlName="processor" autocomplete="off" />
+        @if (form.controls.processor.touched && form.controls.processor.invalid) {
+          <span class="field-error">Required.</span>
+        }
+      </label>
+
+      <label class="field">
+        <span>RAM amount</span>
+        <input type="text" formControlName="ramAmount" autocomplete="off" />
+        @if (form.controls.ramAmount.touched && form.controls.ramAmount.invalid) {
+          <span class="field-error">Required.</span>
+        }
+      </label>
+
+      <label class="field full">
+        <span>Location</span>
+        <input type="text" formControlName="location" autocomplete="off" />
+        @if (form.controls.location.touched && form.controls.location.invalid) {
+          <span class="field-error">Required.</span>
+        }
+      </label>
+
+      <label class="field full">
+        <span>Description</span>
+        <textarea formControlName="description" rows="3"></textarea>
+        @if (form.controls.description.touched && form.controls.description.invalid) {
+          <span class="field-error">Required.</span>
+        }
+      </label>
+
+      <div class="actions full">
+        <button type="submit" class="primary" [disabled]="submitting()">
+          {{ submitting() ? 'Saving…' : isEdit() ? 'Save changes' : 'Create device' }}
+        </button>
+        <a routerLink="/devices" class="cancel">Cancel</a>
+      </div>
+    </form>
+
+    <p class="hint">
+      Name and manufacturer together must be unique. The API rejects duplicates.
+    </p>
+  }
+</section>

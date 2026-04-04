@@ -1,0 +1,78 @@
+<section class="panel">
+  <div class="panel-head">
+    <h1>Device details</h1>
+    <div class="head-actions">
+      @if (device(); as d) {
+        <a [routerLink]="['/devices', d.id, 'edit']" class="btn-secondary">Edit</a>
+      }
+      <a routerLink="/devices" class="ghost-link">Back to list</a>
+    </div>
+  </div>
+
+  @if (error(); as err) {
+    <div class="banner err" role="alert">{{ err }}</div>
+  } @else if (loading()) {
+    <p class="muted">Loading…</p>
+  } @else if (device(); as dev) {
+    @if (actionError(); as ae) {
+      <div class="banner warn" role="alert">{{ ae }}</div>
+    }
+
+    <dl class="detail-grid">
+      <dt>Name</dt>
+      <dd>{{ dev.name }}</dd>
+
+      <dt>Manufacturer</dt>
+      <dd>{{ dev.manufacturer }}</dd>
+
+      <dt>Type</dt>
+      <dd>{{ dev.type }}</dd>
+
+      <dt>Operating system</dt>
+      <dd>{{ dev.operatingSystem }}</dd>
+
+      <dt>OS version</dt>
+      <dd>{{ dev.osVersion }}</dd>
+
+      <dt>Processor</dt>
+      <dd>{{ dev.processor }}</dd>
+
+      <dt>RAM</dt>
+      <dd>{{ dev.ramAmount }}</dd>
+
+      <dt>Location</dt>
+      <dd>{{ dev.location }}</dd>
+
+      <dt>Assigned to</dt>
+      <dd>
+        @if (dev.assignedUserName) {
+          {{ dev.assignedUserName }}
+        } @else {
+          <span class="muted">Not assigned</span>
+        }
+      </dd>
+
+      <dt>Description</dt>
+      <dd class="description">{{ dev.description || '—' }}</dd>
+    </dl>
+
+    <div class="assign-row">
+      <button
+        type="button"
+        class="primary"
+        [disabled]="!canAssign(dev) || busyAssign()"
+        (click)="assign()"
+      >
+        {{ busyAssign() ? '…' : 'Assign to me' }}
+      </button>
+      <button
+        type="button"
+        class="btn-danger"
+        [disabled]="!canUnassign(dev) || busyAssign()"
+        (click)="unassign()"
+      >
+        Unassign
+      </button>
+    </div>
+  }
+</section>

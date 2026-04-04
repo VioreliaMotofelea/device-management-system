@@ -1,4 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthStorageService } from '../../core/auth/auth-storage.service';
 import { getApiErrorMessage } from '../../core/http/api-error';
@@ -7,7 +8,7 @@ import type { Device } from './device.types';
 
 @Component({
   selector: 'app-device-list',
-  imports: [],
+  imports: [RouterLink],
   templateUrl: './device-list.component.html',
   styleUrl: './device-list.component.css',
 })
@@ -47,14 +48,38 @@ export class DeviceListComponent implements OnInit {
   }
 
   protected assign(id: number): void {
-    this.runAction(id, this.devicesApi.assign(id));
+    this.runRowAction(id, this.devicesApi.assign(id));
   }
 
   protected unassign(id: number): void {
-    this.runAction(id, this.devicesApi.unassign(id));
+    this.runRowAction(id, this.devicesApi.unassign(id));
   }
 
-  private runAction(id: number, action$: Observable<Device>): void {
+  protected deleteDevice(device: Device): void {
+    const ok = confirm(
+      `Delete “${device.name}” (${device.manufacturer})? This cannot be undone.`,
+    );
+    if (!ok) {
+      return;
+    }
+
+    this.actionError.set(null);
+    this.busyId.set(device.id);
+    this.devicesApi.delete(device.id).subscribe({
+      next: () => {
+        this.devices.update((list) => list.filter((d) => d.id !== device.id));
+        this.busyId.set(null);
+      },
+      error: (err) => {
+        this.busyId.set(null);
+        this.actionError.set(
+          getApiErrorMessage(err, 'Could not delete device.'),
+        );
+      },
+    });
+  }
+
+  private runRowAction(id: number, action$: Observable<Device>): void {
     this.actionError.set(null);
     this.busyId.set(id);
     action$.subscribe({
@@ -83,5 +108,9 @@ export class DeviceListComponent implements OnInit {
       return false;
     }
     return device.assignedUserId === uid;
+  }
+
+  protected rowBusy(id: number): boolean {
+    return this.busyId() === id;
   }
 }

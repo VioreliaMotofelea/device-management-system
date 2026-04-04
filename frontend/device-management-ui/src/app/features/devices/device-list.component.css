@@ -11,6 +11,29 @@
   justify-content: space-between;
   gap: 1rem;
   margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.head-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  display: inline-block;
+  padding: 0.4rem 0.85rem;
+  border-radius: 8px;
+  background: var(--dm-primary);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.05);
 }
 
 h1 {
@@ -87,11 +110,32 @@ th {
   letter-spacing: 0.02em;
 }
 
+.col-actions {
+  min-width: 12rem;
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem 0.75rem;
   white-space: nowrap;
+  align-items: center;
+}
+
+.device-link {
+  color: var(--dm-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.device-link:hover {
+  text-decoration: underline;
+}
+
+.linkish.disabled {
+  pointer-events: none;
+  color: var(--dm-muted);
+  text-decoration: none;
 }
 
 .linkish {
