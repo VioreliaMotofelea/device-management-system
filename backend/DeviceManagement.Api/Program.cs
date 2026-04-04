@@ -15,12 +15,24 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDeviceManagementSwagger();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(
+        "AngularDev",
+        policy => policy
+            .WithOrigins("http://localhost:4200", "http://127.0.0.1:4200")
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+});
+
 var app = builder.Build();
 
 app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
+
+app.UseCors("AngularDev");
 
 app.UseGlobalExceptionHandler();
 
