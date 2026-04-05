@@ -1,0 +1,38 @@
+@if (open()) {
+  <div
+    class="backdrop"
+    role="presentation"
+    (click)="onBackdropClick($event)"
+  >
+    <div
+      class="dialog"
+      role="alertdialog"
+      aria-modal="true"
+      [attr.aria-labelledby]="titleId"
+      [attr.aria-describedby]="descId"
+      (click)="$event.stopPropagation()"
+    >
+      <h2 [id]="titleId" class="title">{{ titleText() }}</h2>
+      <p [id]="descId" class="message">{{ message() }}</p>
+      <div class="actions">
+        <button
+          type="button"
+          class="btn-cancel"
+          [disabled]="busy()"
+          (click)="onCancel()"
+        >
+          {{ cancelLabel() }}
+        </button>
+        <button
+          type="button"
+          class="btn-confirm"
+          [class.destructive]="destructive()"
+          [disabled]="busy()"
+          (click)="onConfirm()"
+        >
+          {{ busy() ? '…' : confirmLabel() }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

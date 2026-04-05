@@ -79,7 +79,7 @@
                   type="button"
                   class="linkish danger"
                   [disabled]="rowBusy(d.id)"
-                  (click)="deleteDevice(d)"
+                  (click)="openDeleteDialog(d)"
                 >
                   Delete
                 </button>
@@ -91,3 +91,15 @@
     </div>
   }
 </section>
+
+<app-confirm-dialog
+  [open]="deleteTarget() !== null"
+  titleText="Delete device"
+  [message]="deleteDialogMessage()"
+  confirmLabel="Delete"
+  cancelLabel="Cancel"
+  [destructive]="true"
+  [busy]="deleteInProgress()"
+  (confirmed)="confirmDelete()"
+  (cancelled)="closeDeleteDialog()"
+/>
