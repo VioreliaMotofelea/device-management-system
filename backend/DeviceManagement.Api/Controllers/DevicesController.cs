@@ -13,11 +13,16 @@ public class DevicesController : ControllerBase
 {
     private readonly IDeviceService _deviceService;
     private readonly IDeviceAssignmentService _assignmentService;
+    private readonly IDeviceDescriptionService _descriptionService;
 
-    public DevicesController(IDeviceService deviceService, IDeviceAssignmentService assignmentService)
+    public DevicesController(
+        IDeviceService deviceService,
+        IDeviceAssignmentService assignmentService,
+        IDeviceDescriptionService descriptionService)
     {
         _deviceService = deviceService;
         _assignmentService = assignmentService;
+        _descriptionService = descriptionService;
     }
 
     [HttpGet]
@@ -32,6 +37,15 @@ public class DevicesController : ControllerBase
     {
         var device = await _deviceService.GetByIdAsync(id);
         return Ok(device);
+    }
+
+    [HttpPost("generate-description")]
+    public async Task<ActionResult<GenerateDeviceDescriptionResponseDto>> GenerateDescription(
+        [FromBody] GenerateDeviceDescriptionRequestDto dto,
+        CancellationToken cancellationToken)
+    {
+        var result = await _descriptionService.GenerateAsync(dto, cancellationToken);
+        return Ok(result);
     }
 
     [HttpPost]

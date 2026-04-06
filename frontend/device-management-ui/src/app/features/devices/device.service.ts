@@ -4,6 +4,10 @@ import { Observable } from 'rxjs';
 import { API_BASE_URL } from '../../core/api/api-base-url.token';
 import type { DeviceWriteDto } from './device-write.model';
 import type { Device } from './device.types';
+import type {
+  GenerateDeviceDescriptionRequest,
+  GenerateDeviceDescriptionResponse,
+} from './generate-device-description.model';
 
 @Injectable({ providedIn: 'root' })
 export class DeviceService {
@@ -36,5 +40,14 @@ export class DeviceService {
 
   unassign(deviceId: number): Observable<Device> {
     return this.http.post<Device>(`${this.baseUrl}/devices/${deviceId}/unassign`, {});
+  }
+
+  generateDescription(
+    body: GenerateDeviceDescriptionRequest,
+  ): Observable<GenerateDeviceDescriptionResponse> {
+    return this.http.post<GenerateDeviceDescriptionResponse>(
+      `${this.baseUrl}/devices/generate-description`,
+      body,
+    );
   }
 }

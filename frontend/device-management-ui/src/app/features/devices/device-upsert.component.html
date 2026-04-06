@@ -80,10 +80,28 @@
       </label>
 
       <label class="field full">
-        <span>Description</span>
+        <span class="description-field-head">
+          <span>Description</span>
+          <button
+            type="button"
+            class="dm-btn dm-btn--outline dm-btn--sm"
+            [disabled]="descriptionGenerating()"
+            (click)="suggestDescription()"
+          >
+            {{ descriptionGenerating() ? 'Generating…' : 'Suggest description' }}
+          </button>
+        </span>
         <textarea formControlName="description" rows="3"></textarea>
         @if (form.controls.description.touched && form.controls.description.invalid) {
           <span class="field-error">Required.</span>
+        }
+        @if (descriptionGenError(); as dge) {
+          <span class="field-error" role="alert">{{ dge }}</span>
+        }
+        @if (lastDescriptionSource(); as src) {
+          <span class="muted description-source-hint">
+            {{ src === 'openai' ? 'Last suggestion: AI (OpenAI).' : 'Last suggestion: local template.' }}
+          </span>
         }
       </label>
 

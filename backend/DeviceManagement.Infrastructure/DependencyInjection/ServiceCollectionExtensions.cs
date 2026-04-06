@@ -24,7 +24,9 @@ public static class ServiceCollectionExtensions
             throw new ArgumentException("A SQL Server connection string is required.", nameof(connectionString));
 
         services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
+        services.Configure<OpenAiDescriptionOptions>(configuration.GetSection(OpenAiDescriptionOptions.SectionName));
 
+        services.AddHttpClient();
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(connectionString));
 
@@ -33,6 +35,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IJwtTokenService, JwtTokenService>();
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IDeviceAssignmentService, DeviceAssignmentService>();
+        services.AddScoped<IDeviceDescriptionService, DeviceDescriptionService>();
 
         services.AddScoped<IDeviceRepository, DeviceRepository>();
         services.AddScoped<IUserRepository, UserRepository>();

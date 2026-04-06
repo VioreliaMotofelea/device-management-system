@@ -27,6 +27,11 @@ export class DeviceUpsertComponent implements OnInit {
   protected readonly loadError = signal<string | null>(null);
   protected readonly submitError = signal<string | null>(null);
   protected readonly submitting = signal(false);
+  protected readonly descriptionGenerating = signal(false);
+  protected readonly descriptionGenError = signal<string | null>(null);
+  protected readonly lastDescriptionSource = signal<'openai' | 'template' | null>(
+    null,
+  );
   protected readonly isEdit = signal(false);
   private deviceId: number | null = null;
 
@@ -86,6 +91,71 @@ export class DeviceUpsertComponent implements OnInit {
         );
       },
     });
+  }
+
+  protected suggestDescription(): void {
+    this.descriptionGenError.set(null);
+    const v = this.form.getRawValue();
+    const specKeys = [
+      'name',
+      'manufacturer',
+      'type',
+      'operatingSystem',
+      'osVersion',
+      'processor',
+      'ramAmount',
+    ] as const;
+    for (const key of specKeys) {
+      this.form.controls[key].markAsTouched();
+    }
+    if (
+      specKeys.some((key) => {
+        const c = this.form.controls[key];
+        return c.invalid || !String(c.value ?? '').trim();
+      })
+    ) {
+      this.descriptionGenError.set(
+        'Fill in name, manufacturer, type, OS, OS version, processor, and RAM first.',
+      );
+      return;
+    }
+    const type = v.type.trim().toLowerCase();
+    if (!this.typeOptions.includes(type as (typeof DEVICE_TYPE_VALUES)[number])) {
+      this.descriptionGenError.set("Type must be 'phone' or 'tablet'.");
+      return;
+    }
+
+    this.descriptionGenerating.set(true);
+    this.devicesApi
+      .generateDescription({
+        name: v.name.trim(),
+        manufacturer: v.manufacturer.trim(),
+        type,
+        operatingSystem: v.operatingSystem.trim(),
+        osVersion: v.osVersion.trim(),
+        processor: v.processor.trim(),
+        ramAmount: v.ramAmount.trim(),
+      })
+      .subscribe({
+        next: (res) => {
+          this.descriptionGenerating.set(false);
+          const text = res.description?.trim() ?? '';
+          if (!text) {
+            this.descriptionGenError.set('No description was returned.');
+            return;
+          }
+          this.form.controls.description.setValue(text);
+          this.form.controls.description.markAsTouched();
+          const src = res.source?.toLowerCase() === 'openai' ? 'openai' : 'template';
+          this.lastDescriptionSource.set(src);
+        },
+        error: (err) => {
+          this.descriptionGenerating.set(false);
+          this.descriptionGenError.set(
+            getApiErrorMessage(err, 'Could not generate description.'),
+          );
+        },
+      });
   }
 
   protected submit(): void {
