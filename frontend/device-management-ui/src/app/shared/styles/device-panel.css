@@ -1,0 +1,112 @@
+ /* shared device screens for panel shell, table, banners, quiet links */
+
+.panel {
+  background: var(--dm-surface);
+  border-radius: var(--dm-radius);
+  box-shadow: var(--dm-shadow);
+  padding: 1.25rem 1.5rem;
+}
+
+.panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.head-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.panel-head.align-start {
+  align-items: flex-start;
+}
+
+.panel h1 {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 600;
+}
+
+.lede {
+  margin: 0 0 1rem;
+  color: var(--dm-muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.muted {
+  color: var(--dm-muted);
+}
+
+.banner {
+  padding: 0.65rem 0.85rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.banner.err {
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.banner.warn {
+  background: #fffbeb;
+  color: #92400e;
+}
+
+.link-quiet {
+  font-size: 0.9rem;
+  color: var(--dm-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.link-quiet:hover {
+  text-decoration: underline;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.55rem 0.5rem;
+  border-bottom: 1px solid var(--dm-border);
+}
+
+th {
+  font-weight: 600;
+  color: var(--dm-muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.col-actions {
+  min-width: 17rem;
+}
+
+.device-link {
+  color: var(--dm-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.device-link:hover {
+  text-decoration: underline;
+}

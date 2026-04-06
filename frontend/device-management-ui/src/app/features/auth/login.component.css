@@ -1,3 +1,5 @@
+@import '../../shared/styles/dm-buttons.css';
+
 .auth-page {
   min-height: 100dvh;
   display: flex;
@@ -71,21 +73,9 @@ input:focus {
   font-size: 0.8rem;
 }
 
-.primary {
+.auth-submit {
+  width: 100%;
   margin-top: 0.25rem;
-  padding: 0.6rem 1rem;
-  border: none;
-  border-radius: 8px;
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-  background: var(--dm-primary);
-  color: #fff;
-}
-
-.primary:disabled {
-  opacity: 0.65;
-  cursor: not-allowed;
 }
 
 .footer-link {

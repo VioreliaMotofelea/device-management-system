@@ -14,10 +14,10 @@
     >
       <h2 [id]="titleId" class="title">{{ titleText() }}</h2>
       <p [id]="descId" class="message">{{ message() }}</p>
-      <div class="actions">
+      <div class="dialog-actions">
         <button
           type="button"
-          class="btn-cancel"
+          class="dm-btn dm-btn--outline"
           [disabled]="busy()"
           (click)="onCancel()"
         >
@@ -25,8 +25,9 @@
         </button>
         <button
           type="button"
-          class="btn-confirm"
-          [class.destructive]="destructive()"
+          class="dm-btn"
+          [class.dm-btn--danger]="destructive()"
+          [class.dm-btn--primary]="!destructive()"
           [disabled]="busy()"
           (click)="onConfirm()"
         >

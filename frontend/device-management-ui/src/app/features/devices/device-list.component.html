@@ -2,8 +2,13 @@
   <div class="panel-head">
     <h1>Devices</h1>
     <div class="head-actions">
-      <a routerLink="/devices/new" class="btn-primary">Add device</a>
-      <button type="button" class="ghost-btn" (click)="refresh()" [disabled]="loading()">
+      <a routerLink="/devices/new" class="dm-btn dm-btn--primary">Add device</a>
+      <button
+        type="button"
+        class="dm-btn dm-btn--outline"
+        (click)="refresh()"
+        [disabled]="loading()"
+      >
         Refresh
       </button>
     </div>
@@ -53,15 +58,15 @@
               <td class="actions">
                 <a
                   [routerLink]="['/devices', d.id, 'edit']"
-                  class="action-btn action-btn--neutral"
-                  [class.action-btn--disabled]="rowBusy(d.id)"
+                  class="dm-btn dm-btn--sm dm-btn--outline"
+                  [class.dm-btn--disabled]="rowBusy(d.id)"
                   (click)="rowBusy(d.id) && $event.preventDefault()"
                 >
                   Edit
                 </a>
                 <button
                   type="button"
-                  class="action-btn action-btn--accent"
+                  class="dm-btn dm-btn--sm dm-btn--accent"
                   [disabled]="!canAssign(d) || rowBusy(d.id)"
                   (click)="assign(d.id)"
                 >
@@ -69,7 +74,7 @@
                 </button>
                 <button
                   type="button"
-                  class="action-btn action-btn--risk"
+                  class="dm-btn dm-btn--sm dm-btn--risk"
                   [disabled]="!canUnassign(d) || rowBusy(d.id)"
                   (click)="unassign(d.id)"
                 >
@@ -77,7 +82,7 @@
                 </button>
                 <button
                   type="button"
-                  class="action-btn action-btn--delete"
+                  class="dm-btn dm-btn--sm dm-btn--danger"
                   [disabled]="rowBusy(d.id)"
                   (click)="openDeleteDialog(d)"
                 >

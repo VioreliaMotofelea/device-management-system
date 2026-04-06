@@ -1,7 +1,7 @@
 <section class="panel">
-  <div class="panel-head">
+  <div class="panel-head align-start">
     <h1>{{ isEdit() ? 'Edit device' : 'Add device' }}</h1>
-    <a routerLink="/devices" class="ghost-link">Back to list</a>
+    <a routerLink="/devices" class="link-quiet">Back to list</a>
   </div>
 
   @if (loadError(); as le) {
@@ -87,11 +87,15 @@
         }
       </label>
 
-      <div class="actions full">
-        <button type="submit" class="primary" [disabled]="submitting()">
+      <div class="form-actions full">
+        <button
+          type="submit"
+          class="dm-btn dm-btn--primary"
+          [disabled]="submitting()"
+        >
           {{ submitting() ? 'Saving…' : isEdit() ? 'Save changes' : 'Create device' }}
         </button>
-        <a routerLink="/devices" class="cancel">Cancel</a>
+        <a routerLink="/devices" class="dm-btn dm-btn--outline">Cancel</a>
       </div>
     </form>
 

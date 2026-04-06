@@ -1,3 +1,5 @@
+@import '../../styles/dm-buttons.css';
+
 .backdrop {
   position: fixed;
   inset: 0;
@@ -35,53 +37,9 @@
   color: var(--dm-muted, #64748b);
 }
 
-.actions {
+.dialog-actions {
   display: flex;
   justify-content: flex-end;
   gap: 0.65rem;
   flex-wrap: wrap;
-}
-
-.btn-cancel,
-.btn-confirm {
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font: inherit;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  border: 1px solid var(--dm-border, #e2e8f0);
-}
-
-.btn-cancel {
-  background: var(--dm-surface, #fff);
-  color: var(--dm-text, #0f172a);
-}
-
-.btn-cancel:hover:not(:disabled) {
-  background: var(--dm-bg-subtle, #f8fafc);
-}
-
-.btn-confirm {
-  background: var(--dm-primary, #2563eb);
-  color: #fff;
-  border-color: transparent;
-}
-
-.btn-confirm:hover:not(:disabled) {
-  filter: brightness(1.06);
-}
-
-.btn-confirm.destructive {
-  background: #dc2626;
-}
-
-.btn-confirm.destructive:hover:not(:disabled) {
-  filter: brightness(1.05);
-}
-
-.btn-cancel:disabled,
-.btn-confirm:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
 }

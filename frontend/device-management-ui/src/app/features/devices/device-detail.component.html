@@ -3,9 +3,11 @@
     <h1>Device details</h1>
     <div class="head-actions">
       @if (device(); as d) {
-        <a [routerLink]="['/devices', d.id, 'edit']" class="btn-secondary">Edit</a>
+        <a [routerLink]="['/devices', d.id, 'edit']" class="dm-btn dm-btn--outline">
+          Edit
+        </a>
       }
-      <a routerLink="/devices" class="ghost-link">Back to list</a>
+      <a routerLink="/devices" class="link-quiet">Back to list</a>
     </div>
   </div>
 
@@ -59,7 +61,7 @@
     <div class="assign-row">
       <button
         type="button"
-        class="primary"
+        class="dm-btn dm-btn--primary"
         [disabled]="!canAssign(dev) || busyAssign()"
         (click)="assign()"
       >
@@ -67,7 +69,7 @@
       </button>
       <button
         type="button"
-        class="btn-danger"
+        class="dm-btn dm-btn--risk"
         [disabled]="!canUnassign(dev) || busyAssign()"
         (click)="unassign()"
       >
