@@ -111,14 +111,13 @@ th {
 }
 
 .col-actions {
-  min-width: 12rem;
+  min-width: 17rem;
 }
 
 .actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem 0.75rem;
-  white-space: nowrap;
+  gap: 0.4rem;
   align-items: center;
 }
 
@@ -132,29 +131,73 @@ th {
   text-decoration: underline;
 }
 
-.linkish.disabled {
-  pointer-events: none;
-  color: var(--dm-muted);
-  text-decoration: none;
-}
-
-.linkish {
-  border: none;
-  background: none;
-  padding: 0;
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.38rem 0.7rem;
+  border-radius: 8px;
   font: inherit;
-  font-size: 0.875rem;
-  color: var(--dm-primary);
-  cursor: pointer;
-  text-decoration: underline;
-}
-
-.linkish:disabled {
-  color: var(--dm-muted);
-  cursor: not-allowed;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.2;
   text-decoration: none;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, filter 0.15s;
+  white-space: nowrap;
 }
 
-.linkish.danger:not(:disabled) {
+.action-btn--neutral {
+  background: var(--dm-surface);
+  color: var(--dm-text);
+  border-color: var(--dm-border);
+}
+
+.action-btn--neutral:hover:not(.action-btn--disabled) {
+  background: var(--dm-bg-subtle);
+}
+
+.action-btn--accent {
+  background: var(--dm-surface);
+  color: var(--dm-primary);
+  border-color: #bfdbfe;
+}
+
+.action-btn--accent:hover:not(:disabled) {
+  background: #eff6ff;
+  border-color: #93c5fd;
+}
+
+.action-btn--risk {
+  background: var(--dm-surface);
   color: #b91c1c;
+  border-color: #fecaca;
+}
+
+.action-btn--risk:hover:not(:disabled) {
+  background: #fef2f2;
+  border-color: #f87171;
+}
+
+.action-btn--delete {
+  background: #dc2626;
+  color: #fff;
+  border-color: #dc2626;
+}
+
+.action-btn--delete:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+
+.action-btn:disabled,
+.action-btn--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.action-btn:focus-visible {
+  outline: 2px solid var(--dm-focus);
+  outline-offset: 2px;
 }

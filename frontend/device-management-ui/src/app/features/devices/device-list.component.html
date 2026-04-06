@@ -53,15 +53,15 @@
               <td class="actions">
                 <a
                   [routerLink]="['/devices', d.id, 'edit']"
-                  class="linkish"
-                  [class.disabled]="rowBusy(d.id)"
+                  class="action-btn action-btn--neutral"
+                  [class.action-btn--disabled]="rowBusy(d.id)"
                   (click)="rowBusy(d.id) && $event.preventDefault()"
                 >
                   Edit
                 </a>
                 <button
                   type="button"
-                  class="linkish"
+                  class="action-btn action-btn--accent"
                   [disabled]="!canAssign(d) || rowBusy(d.id)"
                   (click)="assign(d.id)"
                 >
@@ -69,7 +69,7 @@
                 </button>
                 <button
                   type="button"
-                  class="linkish danger"
+                  class="action-btn action-btn--risk"
                   [disabled]="!canUnassign(d) || rowBusy(d.id)"
                   (click)="unassign(d.id)"
                 >
@@ -77,7 +77,7 @@
                 </button>
                 <button
                   type="button"
-                  class="linkish danger"
+                  class="action-btn action-btn--delete"
                   [disabled]="rowBusy(d.id)"
                   (click)="openDeleteDialog(d)"
                 >
