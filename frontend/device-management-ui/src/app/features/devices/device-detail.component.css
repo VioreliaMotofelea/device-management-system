@@ -1,0 +1,63 @@
+@import '../../shared/styles/device-panel.css';
+@import '../../shared/styles/dm-buttons.css';
+
+.head-actions {
+  gap: 0.75rem;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: minmax(8rem, 11rem) 1fr;
+  gap: 0.65rem 1.25rem;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 540px) {
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  dt {
+    color: var(--dm-muted);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    margin-top: 0.5rem;
+  }
+
+  dt:first-child {
+    margin-top: 0;
+  }
+}
+
+dt {
+  margin: 0;
+  font-weight: 600;
+  color: var(--dm-muted);
+}
+
+dd {
+  margin: 0;
+}
+
+.description {
+  grid-column: 1 / -1;
+  white-space: pre-wrap;
+  line-height: 1.45;
+}
+
+@media (min-width: 541px) {
+  .description {
+    grid-column: 2;
+  }
+}
+
+.assign-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--dm-border);
+}

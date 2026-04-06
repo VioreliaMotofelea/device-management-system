@@ -30,7 +30,11 @@
         }
       </label>
 
-      <button type="submit" class="primary" [disabled]="submitting()">
+      <button
+        type="submit"
+        class="dm-btn dm-btn--primary auth-submit"
+        [disabled]="submitting()"
+      >
         {{ submitting() ? 'Creating account…' : 'Register' }}
       </button>
     </form>

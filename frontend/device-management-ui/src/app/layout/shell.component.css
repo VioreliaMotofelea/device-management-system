@@ -1,3 +1,5 @@
+@import '../shared/styles/dm-buttons.css';
+
 .shell {
   min-height: 100dvh;
   display: flex;
@@ -35,20 +37,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.ghost {
-  padding: 0.35rem 0.75rem;
-  border-radius: 8px;
-  border: 1px solid var(--dm-border);
-  background: transparent;
-  font: inherit;
-  font-size: 0.875rem;
-  cursor: pointer;
-}
-
-.ghost:hover {
-  background: var(--dm-bg-subtle);
 }
 
 .main {

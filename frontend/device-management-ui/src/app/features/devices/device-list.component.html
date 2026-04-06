@@ -1,14 +1,21 @@
 <section class="panel">
   <div class="panel-head">
     <h1>Devices</h1>
-    <button type="button" class="ghost-btn" (click)="refresh()" [disabled]="loading()">
-      Refresh
-    </button>
+    <div class="head-actions">
+      <a routerLink="/devices/new" class="dm-btn dm-btn--primary">Add device</a>
+      <button
+        type="button"
+        class="dm-btn dm-btn--outline"
+        (click)="refresh()"
+        [disabled]="loading()"
+      >
+        Refresh
+      </button>
+    </div>
   </div>
 
   <p class="lede">
-    Assign a device to yourself if it is free, or unassign one that is yours.
-    (Full create/edit/delete flows come in Phase 2.)
+    Open a device for full details. Assign or unassign when the device is free or assigned to you.
   </p>
 
   @if (actionError(); as ae) {
@@ -20,7 +27,7 @@
   } @else if (loading()) {
     <p class="muted">Loading…</p>
   } @else if (devices().length === 0) {
-    <p class="muted">No devices yet.</p>
+    <p class="muted">No devices yet. Use <strong>Add device</strong> to create one.</p>
   } @else {
     <div class="table-wrap">
       <table>
@@ -30,13 +37,15 @@
             <th>Manufacturer</th>
             <th>Type</th>
             <th>Assigned to</th>
-            <th></th>
+            <th class="col-actions">Actions</th>
           </tr>
         </thead>
         <tbody>
           @for (d of devices(); track d.id) {
             <tr>
-              <td>{{ d.name }}</td>
+              <td>
+                <a [routerLink]="['/devices', d.id]" class="device-link">{{ d.name }}</a>
+              </td>
               <td>{{ d.manufacturer }}</td>
               <td>{{ d.type }}</td>
               <td>
@@ -47,21 +56,37 @@
                 }
               </td>
               <td class="actions">
+                <a
+                  [routerLink]="['/devices', d.id, 'edit']"
+                  class="dm-btn dm-btn--sm dm-btn--outline"
+                  [class.dm-btn--disabled]="rowBusy(d.id)"
+                  (click)="rowBusy(d.id) && $event.preventDefault()"
+                >
+                  Edit
+                </a>
                 <button
                   type="button"
-                  class="linkish"
-                  [disabled]="!canAssign(d) || busyId() === d.id"
+                  class="dm-btn dm-btn--sm dm-btn--accent"
+                  [disabled]="!canAssign(d) || rowBusy(d.id)"
                   (click)="assign(d.id)"
                 >
-                  {{ busyId() === d.id ? '…' : 'Assign to me' }}
+                  {{ rowBusy(d.id) ? '…' : 'Assign to me' }}
                 </button>
                 <button
                   type="button"
-                  class="linkish danger"
-                  [disabled]="!canUnassign(d) || busyId() === d.id"
+                  class="dm-btn dm-btn--sm dm-btn--risk"
+                  [disabled]="!canUnassign(d) || rowBusy(d.id)"
                   (click)="unassign(d.id)"
                 >
                   Unassign
+                </button>
+                <button
+                  type="button"
+                  class="dm-btn dm-btn--sm dm-btn--danger"
+                  [disabled]="rowBusy(d.id)"
+                  (click)="openDeleteDialog(d)"
+                >
+                  Delete
                 </button>
               </td>
             </tr>
@@ -71,3 +96,15 @@
     </div>
   }
 </section>
+
+<app-confirm-dialog
+  [open]="deleteTarget() !== null"
+  titleText="Delete device"
+  [message]="deleteDialogMessage()"
+  confirmLabel="Delete"
+  cancelLabel="Cancel"
+  [destructive]="true"
+  [busy]="deleteInProgress()"
+  (confirmed)="confirmDelete()"
+  (cancelled)="closeDeleteDialog()"
+/>
