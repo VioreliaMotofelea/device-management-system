@@ -32,6 +32,13 @@ public class DevicesController : ControllerBase
         return Ok(devices);
     }
 
+    [HttpGet("search")]
+    public async Task<IActionResult> Search([FromQuery] string q)
+    {
+        var devices = await _deviceService.SearchAsync(q);
+        return Ok(devices);
+    }
+
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
     {
