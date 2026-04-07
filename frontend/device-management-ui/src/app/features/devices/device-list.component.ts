@@ -1,4 +1,5 @@
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthStorageService } from '../../core/auth/auth-storage.service';
@@ -9,7 +10,7 @@ import type { Device } from './device.types';
 
 @Component({
   selector: 'app-device-list',
-  imports: [RouterLink, ConfirmDialogComponent],
+  imports: [RouterLink, ConfirmDialogComponent, FormsModule],
   templateUrl: './device-list.component.html',
   styleUrl: './device-list.component.css',
 })
@@ -21,6 +22,7 @@ export class DeviceListComponent implements OnInit {
   protected readonly loading = signal(true);
   protected readonly listError = signal<string | null>(null);
   protected readonly actionError = signal<string | null>(null);
+  protected readonly searchQuery = signal('');
   protected readonly busyId = signal<number | null>(null);
   protected readonly deleteTarget = signal<Device | null>(null);
 
@@ -46,6 +48,7 @@ export class DeviceListComponent implements OnInit {
   }
 
   protected refresh(): void {
+    this.searchQuery.set('');
     this.listError.set(null);
     this.loading.set(true);
     this.devicesApi.getAll().subscribe({
@@ -60,6 +63,36 @@ export class DeviceListComponent implements OnInit {
         );
       },
     });
+  }
+
+  protected search(): void {
+    this.actionError.set(null);
+    this.listError.set(null);
+
+    const query = this.searchQuery().trim();
+    if (!query) {
+      this.refresh();
+      return;
+    }
+
+    this.loading.set(true);
+    this.devicesApi.search(query).subscribe({
+      next: (list) => {
+        this.devices.set(list);
+        this.loading.set(false);
+      },
+      error: (err) => {
+        this.loading.set(false);
+        this.listError.set(
+          getApiErrorMessage(err, 'Could not search devices.'),
+        );
+      },
+    });
+  }
+
+  protected clearSearch(): void {
+    this.searchQuery.set('');
+    this.refresh();
   }
 
   protected assign(id: number): void {
