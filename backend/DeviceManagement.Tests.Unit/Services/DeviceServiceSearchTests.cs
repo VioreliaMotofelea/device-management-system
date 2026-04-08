@@ -121,6 +121,46 @@ public sealed class DeviceServiceSearchTests
         Assert.Equal("Snappy Pro", result[1].Name);
     }
 
+    [Fact]
+    public async Task SearchAsync_UsesIdAsDeterministicTieBreaker_WhenScoresEqual()
+    {
+        var devices = new List<Device>
+        {
+            new()
+            {
+                Id = 20,
+                Name = "Tie Alpha",
+                Manufacturer = "Contoso",
+                Type = "phone",
+                OperatingSystem = "Android",
+                OsVersion = "14",
+                Processor = "Chip",
+                RamAmount = "8 GB",
+                Location = "London"
+            },
+            new()
+            {
+                Id = 10,
+                Name = "Tie Beta",
+                Manufacturer = "Contoso",
+                Type = "phone",
+                OperatingSystem = "Android",
+                OsVersion = "14",
+                Processor = "Chip",
+                RamAmount = "8 GB",
+                Location = "London"
+            }
+        };
+
+        var sut = new DeviceService(new FakeDeviceRepository(devices));
+
+        var result = await sut.SearchAsync("contoso");
+
+        Assert.Equal(2, result.Count);
+        Assert.Equal(10, result[0].Id);
+        Assert.Equal(20, result[1].Id);
+    }
+
     private sealed class FakeDeviceRepository : IDeviceRepository
     {
         private readonly List<Device> _devices;

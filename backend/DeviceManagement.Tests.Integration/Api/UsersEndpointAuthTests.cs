@@ -37,6 +37,18 @@ public sealed class UsersEndpointAuthTests : IClassFixture<WebApplicationFactory
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
+    [Fact]
+    public async Task GetUserById_NotFound_ReturnsNotFound()
+    {
+        using var client = _factory.CreateClient();
+        var token = await RegisterAndLoginAsync(client);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        var response = await client.GetAsync("/api/users/999999");
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
     private static async Task<string> RegisterAndLoginAsync(HttpClient client)
     {
         var email = $"users.{Guid.NewGuid():N}@example.com";

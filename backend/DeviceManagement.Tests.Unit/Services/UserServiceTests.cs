@@ -96,6 +96,27 @@ public sealed class UserServiceTests
         Assert.Equal("New User", result.Name);
     }
 
+    [Fact]
+    public async Task DeleteAsync_Succeeds_WhenUserHasNoAssignedDevices()
+    {
+        var user = new User
+        {
+            Id = 5,
+            Email = "ok@example.com",
+            FullName = "Ok User",
+            Role = "Employee",
+            Location = "London",
+            PasswordHash = "hash"
+        };
+        var users = new FakeUserRepository { UserById = user };
+        var devices = new FakeDeviceRepository { AnyAssignedToUser = false };
+        var sut = new UserService(users, devices, new FakePasswordHasher());
+
+        await sut.DeleteAsync(5);
+
+        Assert.Null(users.UserById);
+    }
+
     private static UserService CreateSut(
         User? userById = null,
         bool userExists = false,
