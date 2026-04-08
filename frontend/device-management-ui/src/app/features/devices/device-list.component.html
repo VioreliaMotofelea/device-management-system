@@ -18,6 +18,28 @@
     Open a device for full details. Assign or unassign when the device is free or assigned to you.
   </p>
 
+  <form class="search-row" (ngSubmit)="search()">
+    <input
+      type="text"
+      name="deviceQuery"
+      [ngModel]="searchQuery()"
+      (ngModelChange)="searchQuery.set($event)"
+      placeholder="Search by name, manufacturer, RAM, processor..."
+      autocomplete="off"
+    />
+    <button type="submit" class="dm-btn dm-btn--outline" [disabled]="loading()">
+      Search
+    </button>
+    <button
+      type="button"
+      class="dm-btn dm-btn--outline"
+      [disabled]="loading()"
+      (click)="clearSearch()"
+    >
+      Clear
+    </button>
+  </form>
+
   @if (actionError(); as ae) {
     <div class="banner warn" role="alert">{{ ae }}</div>
   }
@@ -27,7 +49,9 @@
   } @else if (loading()) {
     <p class="muted">Loading…</p>
   } @else if (devices().length === 0) {
-    <p class="muted">No devices yet. Use <strong>Add device</strong> to create one.</p>
+    <p class="muted">
+      {{ searchQuery().trim() ? 'No devices match your search.' : 'No devices yet. Use Add device to create one.' }}
+    </p>
   } @else {
     <div class="table-wrap">
       <table>

@@ -5,11 +5,17 @@ using DeviceManagement.Application.Interfaces.Repositories;
 using DeviceManagement.Application.Interfaces.Services;
 using DeviceManagement.Application.Mapping;
 using DeviceManagement.Domain.Entities;
+using System.Text;
 
 namespace DeviceManagement.Infrastructure.Services;
 
 public class DeviceService : IDeviceService
 {
+    private const int NameWeight = 8;
+    private const int ManufacturerWeight = 5;
+    private const int ProcessorWeight = 3;
+    private const int RamWeight = 2;
+
     private readonly IDeviceRepository _deviceRepository;
 
     public DeviceService(IDeviceRepository deviceRepository)
@@ -21,6 +27,32 @@ public class DeviceService : IDeviceService
     {
         var devices = await _deviceRepository.GetAllAsync();
         return devices.Select(DeviceResponseMapper.ToDto).ToList();
+    }
+
+    public async Task<List<DeviceResponseDto>> SearchAsync(string query)
+    {
+        if (string.IsNullOrWhiteSpace(query))
+            throw new ValidationException("Search query is required.");
+
+        var tokens = Tokenize(query);
+        if (tokens.Count == 0)
+            throw new ValidationException("Search query must contain letters or numbers.");
+
+        var devices = await _deviceRepository.GetAllAsync();
+
+        var ranked = devices
+            .Select(device => new
+            {
+                Device = device,
+                Score = CalculateScore(device, tokens)
+            })
+            .Where(x => x.Score > 0)
+            .OrderByDescending(x => x.Score)
+            .ThenBy(x => x.Device.Id)
+            .Select(x => DeviceResponseMapper.ToDto(x.Device))
+            .ToList();
+
+        return ranked;
     }
 
     public async Task<DeviceResponseDto> GetByIdAsync(int id)
@@ -105,5 +137,83 @@ public class DeviceService : IDeviceService
         device.RamAmount = input.RamAmount;
         device.Description = input.Description;
         device.Location = input.Location;
+    }
+
+    private static int CalculateScore(Device device, IReadOnlyCollection<string> tokens)
+    {
+        var name = NormalizeForSearch(device.Name);
+        var manufacturer = NormalizeForSearch(device.Manufacturer);
+        var processor = NormalizeForSearch(device.Processor);
+        var ram = NormalizeForSearch(device.RamAmount);
+        var nameTokenSet = Tokenize(device.Name).ToHashSet();
+        var manufacturerTokenSet = Tokenize(device.Manufacturer).ToHashSet();
+        var processorTokenSet = Tokenize(device.Processor).ToHashSet();
+        var ramTokenSet = Tokenize(device.RamAmount).ToHashSet();
+
+        var score = 0;
+        foreach (var token in tokens)
+        {
+            score += ScoreFieldMatch(name, nameTokenSet, token, NameWeight);
+            score += ScoreFieldMatch(manufacturer, manufacturerTokenSet, token, ManufacturerWeight);
+            score += ScoreFieldMatch(processor, processorTokenSet, token, ProcessorWeight);
+            score += ScoreFieldMatch(ram, ramTokenSet, token, RamWeight);
+        }
+
+        return score;
+    }
+
+    private static List<string> Tokenize(string value)
+    {
+        return NormalizeForSearch(value)
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Distinct()
+            .ToList();
+    }
+
+    private static bool ContainsToken(string normalizedField, string token)
+    {
+        return normalizedField.Contains(token, StringComparison.Ordinal);
+    }
+
+    private static int ScoreFieldMatch(
+        string normalizedField,
+        HashSet<string> exactTokens,
+        string queryToken,
+        int exactMatchWeight)
+    {
+        if (exactTokens.Contains(queryToken))
+            return exactMatchWeight;
+
+        if (ContainsToken(normalizedField, queryToken))
+            return Math.Max(1, exactMatchWeight / 2);
+
+        return 0;
+    }
+
+    private static string NormalizeForSearch(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return string.Empty;
+
+        var sb = new StringBuilder(value.Length);
+        var lastWasSpace = true;
+
+        foreach (var ch in value)
+        {
+            if (char.IsLetterOrDigit(ch))
+            {
+                sb.Append(char.ToLowerInvariant(ch));
+                lastWasSpace = false;
+                continue;
+            }
+
+            if (!lastWasSpace)
+            {
+                sb.Append(' ');
+                lastWasSpace = true;
+            }
+        }
+
+        return sb.ToString().Trim();
     }
 }
