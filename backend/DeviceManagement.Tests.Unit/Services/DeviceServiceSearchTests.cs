@@ -81,6 +81,46 @@ public sealed class DeviceServiceSearchTests
         Assert.Equal("Galaxy S23", result[0].Name);
     }
 
+    [Fact]
+    public async Task SearchAsync_PrioritizesExactTokenOverPartialMatch_InSameFieldWeight()
+    {
+        var devices = new List<Device>
+        {
+            new()
+            {
+                Id = 1,
+                Name = "Snap Core",
+                Manufacturer = "Contoso",
+                Type = "phone",
+                OperatingSystem = "Android",
+                OsVersion = "14",
+                Processor = "Midrange",
+                RamAmount = "6 GB",
+                Location = "London"
+            },
+            new()
+            {
+                Id = 2,
+                Name = "Snappy Pro",
+                Manufacturer = "Contoso",
+                Type = "phone",
+                OperatingSystem = "Android",
+                OsVersion = "14",
+                Processor = "Midrange",
+                RamAmount = "6 GB",
+                Location = "London"
+            }
+        };
+
+        var sut = new DeviceService(new FakeDeviceRepository(devices));
+
+        var result = await sut.SearchAsync("snap");
+
+        Assert.Equal(2, result.Count);
+        Assert.Equal("Snap Core", result[0].Name);
+        Assert.Equal("Snappy Pro", result[1].Name);
+    }
+
     private sealed class FakeDeviceRepository : IDeviceRepository
     {
         private readonly List<Device> _devices;

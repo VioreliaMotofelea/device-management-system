@@ -30,6 +30,19 @@ public sealed class DevicesSearchAuthorizedTests : IClassFixture<WebApplicationF
         Assert.StartsWith("[", body.TrimStart());
     }
 
+    [Fact]
+    public async Task SearchDevices_WithEmptyQuery_ReturnsBadRequest()
+    {
+        using var client = _factory.CreateClient();
+
+        var token = await RegisterAndLoginAsync(client);
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+        var response = await client.GetAsync("/api/devices/search?q=   ");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
+
     private static async Task<string> RegisterAndLoginAsync(HttpClient client)
     {
         var email = $"integration.{Guid.NewGuid():N}@example.com";
