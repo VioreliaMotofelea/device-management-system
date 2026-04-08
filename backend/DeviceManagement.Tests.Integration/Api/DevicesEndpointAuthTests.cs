@@ -21,4 +21,14 @@ public sealed class DevicesEndpointAuthTests : IClassFixture<WebApplicationFacto
 
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
+
+    [Fact]
+    public async Task SearchDevices_WithoutToken_ReturnsUnauthorized()
+    {
+        using var client = _factory.CreateClient();
+
+        var response = await client.GetAsync("/api/devices/search?q=apple");
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
 }
