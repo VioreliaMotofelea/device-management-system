@@ -59,6 +59,23 @@ public sealed class DeviceDescriptionServiceTests
         Assert.Equal("Concise generated description.", result.Description);
     }
 
+    [Fact]
+    public async Task GenerateAsync_FallsBackToTemplate_WhenOpenAiPayloadMalformed()
+    {
+        var malformed = "{ not-json";
+        var sut = CreateService(
+            new OpenAiDescriptionOptions { ApiKey = "test-key" },
+            new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(malformed, Encoding.UTF8, "application/json")
+            });
+
+        var result = await sut.GenerateAsync(BuildRequest());
+
+        Assert.Equal("template", result.Source);
+        Assert.Contains("Pixel 8", result.Description);
+    }
+
     private static DeviceDescriptionService CreateService(OpenAiDescriptionOptions options, HttpResponseMessage response)
     {
         var handler = new StubHttpMessageHandler(response);
