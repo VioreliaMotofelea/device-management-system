@@ -7,6 +7,22 @@ namespace DeviceManagement.Tests.Unit.Application;
 public sealed class AuthValidatorsTests
 {
     [Fact]
+    public void LoginValidator_Throws_WhenBodyNull()
+    {
+        Assert.Throws<ValidationException>(() => LoginRequestValidator.Validate(null));
+    }
+
+    [Fact]
+    public void RegisterValidator_Throws_WhenEmailMissing()
+    {
+        Assert.Throws<ValidationException>(() => RegisterRequestValidator.Validate(new RegisterRequestDto
+        {
+            Email = " ",
+            Password = "Password1"
+        }));
+    }
+
+    [Fact]
     public void LoginValidator_NormalizesEmail()
     {
         var (email, password) = LoginRequestValidator.Validate(new LoginRequestDto

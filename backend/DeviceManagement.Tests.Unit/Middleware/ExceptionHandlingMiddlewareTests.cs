@@ -48,6 +48,24 @@ public sealed class ExceptionHandlingMiddlewareTests
         Assert.Equal("An unexpected error occurred.", doc.RootElement.GetProperty("message").GetString());
     }
 
+    [Fact]
+    public async Task InvokeAsync_ReturnsExceptionMessage_InDevelopment_ForUnknownException()
+    {
+        var middleware = CreateMiddleware(
+            _ => throw new InvalidOperationException("Detailed failure"),
+            isDevelopment: true);
+        var ctx = new DefaultHttpContext();
+        ctx.Response.Body = new MemoryStream();
+
+        await middleware.InvokeAsync(ctx);
+
+        Assert.Equal(500, ctx.Response.StatusCode);
+        ctx.Response.Body.Position = 0;
+        var body = await new StreamReader(ctx.Response.Body).ReadToEndAsync();
+        using var doc = JsonDocument.Parse(body);
+        Assert.Equal("Detailed failure", doc.RootElement.GetProperty("message").GetString());
+    }
+
     private static ExceptionHandlingMiddleware CreateMiddleware(
         RequestDelegate next,
         bool isDevelopment)
