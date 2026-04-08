@@ -145,18 +145,18 @@ public class DeviceService : IDeviceService
         var manufacturer = NormalizeForSearch(device.Manufacturer);
         var processor = NormalizeForSearch(device.Processor);
         var ram = NormalizeForSearch(device.RamAmount);
+        var nameTokenSet = Tokenize(device.Name).ToHashSet();
+        var manufacturerTokenSet = Tokenize(device.Manufacturer).ToHashSet();
+        var processorTokenSet = Tokenize(device.Processor).ToHashSet();
+        var ramTokenSet = Tokenize(device.RamAmount).ToHashSet();
 
         var score = 0;
         foreach (var token in tokens)
         {
-            if (ContainsToken(name, token))
-                score += NameWeight;
-            if (ContainsToken(manufacturer, token))
-                score += ManufacturerWeight;
-            if (ContainsToken(processor, token))
-                score += ProcessorWeight;
-            if (ContainsToken(ram, token))
-                score += RamWeight;
+            score += ScoreFieldMatch(name, nameTokenSet, token, NameWeight);
+            score += ScoreFieldMatch(manufacturer, manufacturerTokenSet, token, ManufacturerWeight);
+            score += ScoreFieldMatch(processor, processorTokenSet, token, ProcessorWeight);
+            score += ScoreFieldMatch(ram, ramTokenSet, token, RamWeight);
         }
 
         return score;
@@ -173,6 +173,21 @@ public class DeviceService : IDeviceService
     private static bool ContainsToken(string normalizedField, string token)
     {
         return normalizedField.Contains(token, StringComparison.Ordinal);
+    }
+
+    private static int ScoreFieldMatch(
+        string normalizedField,
+        HashSet<string> exactTokens,
+        string queryToken,
+        int exactMatchWeight)
+    {
+        if (exactTokens.Contains(queryToken))
+            return exactMatchWeight;
+
+        if (ContainsToken(normalizedField, queryToken))
+            return Math.Max(1, exactMatchWeight / 2);
+
+        return 0;
     }
 
     private static string NormalizeForSearch(string value)
