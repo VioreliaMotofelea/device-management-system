@@ -1,6 +1,7 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using DeviceManagement.Tests.Integration.Fixtures;
 using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace DeviceManagement.Tests.Integration.Api;
@@ -18,13 +19,13 @@ public sealed class DevicesSearchRankingTests : IClassFixture<WebApplicationFact
     public async Task Search_PrioritizesExactNameToken_OverPartialNameToken()
     {
         using var client = _factory.CreateClient();
-        var token = await RegisterAndLoginAsync(client);
+        var token = await TestAuthHelper.RegisterAndLoginAsync(client, "rank");
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         var marker = $"rank{Guid.NewGuid():N}".Substring(0, 12);
 
-        await CreateDeviceAsync(client, BuildDevice($"{marker}", "BrandA"));
-        await CreateDeviceAsync(client, BuildDevice($"{marker}x", "BrandB"));
+        await CreateDeviceAsync(client, TestPayloads.BuildDevicePayload($"{marker}", "BrandA"));
+        await CreateDeviceAsync(client, TestPayloads.BuildDevicePayload($"{marker}x", "BrandB"));
 
         var response = await client.GetAsync($"/api/devices/search?q={marker}");
         response.EnsureSuccessStatusCode();
@@ -41,11 +42,11 @@ public sealed class DevicesSearchRankingTests : IClassFixture<WebApplicationFact
     public async Task Search_IsCaseAndPunctuationTolerant()
     {
         using var client = _factory.CreateClient();
-        var token = await RegisterAndLoginAsync(client);
+        var token = await TestAuthHelper.RegisterAndLoginAsync(client, "rank");
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         var marker = $"norm{Guid.NewGuid():N}".Substring(0, 12);
-        await CreateDeviceAsync(client, BuildDevice($"{marker}", "BrandC", processor: "SnapDragon 8 Gen 2"));
+        await CreateDeviceAsync(client, TestPayloads.BuildDevicePayload($"{marker}", "BrandC", processor: "SnapDragon 8 Gen 2"));
 
         var response = await client.GetAsync($"/api/devices/search?q={marker.ToUpperInvariant()},8");
         response.EnsureSuccessStatusCode();
@@ -60,40 +61,4 @@ public sealed class DevicesSearchRankingTests : IClassFixture<WebApplicationFact
         create.EnsureSuccessStatusCode();
     }
 
-    private static object BuildDevice(string name, string manufacturer, string processor = "Mid Chip") => new
-    {
-        Name = name,
-        Manufacturer = manufacturer,
-        Type = "phone",
-        OperatingSystem = "Android",
-        OsVersion = "14",
-        Processor = processor,
-        RamAmount = "8 GB",
-        Description = "Seeded for integration ranking test.",
-        Location = "London"
-    };
-
-    private static async Task<string> RegisterAndLoginAsync(HttpClient client)
-    {
-        var email = $"rank.{Guid.NewGuid():N}@example.com";
-        const string password = "Password1";
-
-        var registerResp = await client.PostAsJsonAsync("/api/auth/register", new
-        {
-            Email = email,
-            Password = password
-        });
-        registerResp.EnsureSuccessStatusCode();
-
-        var loginResp = await client.PostAsJsonAsync("/api/auth/login", new
-        {
-            Email = email,
-            Password = password
-        });
-        loginResp.EnsureSuccessStatusCode();
-
-        var payload = await loginResp.Content.ReadFromJsonAsync<JsonElement>();
-        return payload.GetProperty("accessToken").GetString()
-            ?? throw new InvalidOperationException("Login response did not include accessToken.");
-    }
 }

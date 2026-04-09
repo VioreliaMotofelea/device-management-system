@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using DeviceManagement.Tests.Integration.Fixtures;
 using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace DeviceManagement.Tests.Integration.Api;
@@ -29,7 +30,7 @@ public sealed class DeviceDescriptionEndpointTests : IClassFixture<WebApplicatio
     public async Task GenerateDescription_WithToken_ReturnsTemplateSource()
     {
         using var client = _factory.CreateClient();
-        var token = await RegisterAndLoginAsync(client, "desc");
+        var token = await TestAuthHelper.RegisterAndLoginAsync(client, "desc");
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         var response = await client.PostAsJsonAsync("/api/devices/generate-description", BuildRequest());
@@ -50,18 +51,4 @@ public sealed class DeviceDescriptionEndpointTests : IClassFixture<WebApplicatio
         RamAmount = "8 GB"
     };
 
-    private static async Task<string> RegisterAndLoginAsync(HttpClient client, string prefix)
-    {
-        var email = $"{prefix}.{Guid.NewGuid():N}@example.com";
-        const string password = "Password1";
-
-        var registerResp = await client.PostAsJsonAsync("/api/auth/register", new { Email = email, Password = password });
-        registerResp.EnsureSuccessStatusCode();
-        var loginResp = await client.PostAsJsonAsync("/api/auth/login", new { Email = email, Password = password });
-        loginResp.EnsureSuccessStatusCode();
-
-        var payload = await loginResp.Content.ReadFromJsonAsync<JsonElement>();
-        return payload.GetProperty("accessToken").GetString()
-            ?? throw new InvalidOperationException("Login response did not include accessToken.");
-    }
 }
