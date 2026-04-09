@@ -13,9 +13,9 @@ This folder contains the complete backend implementation for the Device Manageme
 
 ## Main Features Covered
 
-- Devices CRUD.
+- Devices: full CRUD via the API and UI.
 - Authentication (register/login) with JWT.
-- User authentication (register/login) and users management endpoints (list/get/create/update/delete).
+- User records: secured `/api/users` endpoints support list, get-by-id, create, update, and delete (API/Swagger); the Angular UI focuses on devices, not a full user-admin console.
 - Device assignment and unassignment flows.
 - AI device description generation with OpenAI integration and deterministic template fallback when no API key is configured.
 - Bonus ranked free-text device search (normalized and deterministic).
@@ -40,6 +40,8 @@ Run them using SQL Server Management Studio, DataGrip, or another SQL Server cli
 Configure the development connection string in:
 
 - `DeviceManagement.Api/appsettings.Development.json`
+
+**Windows vs macOS:** on Windows, `DefaultConnection` usually targets LocalDB or a local SQL Server instance. On macOS or Linux, SQL Server often runs in Docker—use the published host/port (typically `Server=localhost,1433;...`) and the SQL credentials you set on the container so they match how you connect when running the SQL scripts.
 
 For secrets such as OpenAI API keys, use user secrets or environment variables.
 

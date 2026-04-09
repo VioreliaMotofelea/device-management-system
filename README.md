@@ -4,7 +4,7 @@ Device inventory system for managing users and devices, including authentication
 
 ## Implemented Scope
 
-- Phase 1: DB scripts + backend logic + API endpoints for device management and user-related operations
+- Phase 1: DB scripts + backend logic + API for device management, authentication, and secured user-record endpoints
 - Phase 2: Angular UI for listing, viewing details, creating, updating, deleting devices
 - Phase 3: Authentication + authorization, including device assignment and unassignment
 - Phase 4: AI device description generator (OpenAI + template fallback)
@@ -34,6 +34,8 @@ The backend follows a layered Repository-Service-Controller architecture with se
 - SQL Server (local instance or Docker)
 
 ## Database Setup
+
+Point the API at the same SQL Server where you ran the scripts: edit `ConnectionStrings:DefaultConnection` in `backend/DeviceManagement.Api/appsettings.Development.json`. On **Windows**, use your local instance (for example LocalDB or a named SQL Server instance). On **macOS** (or Linux), SQL Server is often **Docker**—use the host and port you published (commonly `localhost,1433`) and the SQL login you configured for the container.
 
 Option A (scripts):
 
@@ -84,7 +86,7 @@ The frontend expects the backend API to be running locally.
 3. Open Swagger at `http://localhost:5103/swagger` and verify API endpoints
 4. Start frontend from `frontend/device-management-ui`
 5. Open `http://localhost:4200`
-6. Register a user or log in and test device flows (CRUD, assignment/unassignment, AI description generation, search)
+6. Register a user or log in and test device flows (list/detail/create/update/delete, assignment/unassignment, AI description generation, search)
 
 ## AI Description Configuration
 

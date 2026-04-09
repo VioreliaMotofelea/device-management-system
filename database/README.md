@@ -20,6 +20,6 @@ Run the scripts in this order using SQL Server Management Studio (SSMS), DataGri
 ## Notes
 
 - Scripts are idempotent and safe to re-run.
-- The backend expects the database name to be `DeviceManagementDb`.
+- The backend expects the database name to be `DeviceManagementDb`; point `DefaultConnection` in `backend/DeviceManagement.Api/appsettings.Development.json` at that server.
 - The SQL seed script provides baseline idempotent setup data.
 - The backend also includes a richer development runtime seeder (`DatabaseSeeder`) for additional realistic local testing data.
