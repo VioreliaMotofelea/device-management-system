@@ -2,15 +2,14 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using DeviceManagement.Tests.Integration.Fixtures;
-using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace DeviceManagement.Tests.Integration.Api;
 
-public sealed class UsersCrudEdgeTests : IClassFixture<WebApplicationFactory<Program>>
+public sealed class UsersCrudEdgeTests : IClassFixture<CustomWebApplicationFactory>
 {
-    private readonly WebApplicationFactory<Program> _factory;
+    private readonly CustomWebApplicationFactory _factory;
 
-    public UsersCrudEdgeTests(WebApplicationFactory<Program> factory)
+    public UsersCrudEdgeTests(CustomWebApplicationFactory factory)
     {
         _factory = factory;
     }

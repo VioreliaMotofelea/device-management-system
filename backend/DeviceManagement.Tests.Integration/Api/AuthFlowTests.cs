@@ -1,15 +1,15 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
-using Microsoft.AspNetCore.Mvc.Testing;
+using DeviceManagement.Tests.Integration.Fixtures;
 
 namespace DeviceManagement.Tests.Integration.Api;
 
-public sealed class AuthFlowTests : IClassFixture<WebApplicationFactory<Program>>
+public sealed class AuthFlowTests : IClassFixture<CustomWebApplicationFactory>
 {
-    private readonly WebApplicationFactory<Program> _factory;
+    private readonly CustomWebApplicationFactory _factory;
 
-    public AuthFlowTests(WebApplicationFactory<Program> factory)
+    public AuthFlowTests(CustomWebApplicationFactory factory)
     {
         _factory = factory;
     }

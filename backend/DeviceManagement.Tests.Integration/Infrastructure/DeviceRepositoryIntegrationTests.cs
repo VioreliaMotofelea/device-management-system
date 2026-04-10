@@ -2,16 +2,15 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using DeviceManagement.Application.Interfaces.Repositories;
 using DeviceManagement.Tests.Integration.Fixtures;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DeviceManagement.Tests.Integration.Infrastructure;
 
-public sealed class DeviceRepositoryIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
+public sealed class DeviceRepositoryIntegrationTests : IClassFixture<CustomWebApplicationFactory>
 {
-    private readonly WebApplicationFactory<Program> _factory;
+    private readonly CustomWebApplicationFactory _factory;
 
-    public DeviceRepositoryIntegrationTests(WebApplicationFactory<Program> factory)
+    public DeviceRepositoryIntegrationTests(CustomWebApplicationFactory factory)
     {
         _factory = factory;
     }
