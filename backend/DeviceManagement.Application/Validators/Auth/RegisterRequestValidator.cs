@@ -16,8 +16,12 @@ public static class RegisterRequestValidator
             throw new ValidationException("Email is required.");
         if (string.IsNullOrWhiteSpace(dto.Password))
             throw new ValidationException("Password is required.");
+        if (string.IsNullOrWhiteSpace(dto.ConfirmPassword))
+            throw new ValidationException("Confirm password is required.");
         if (dto.Password.Length < ValidationConstants.MinPasswordLength)
             throw new ValidationException($"Password must be at least {ValidationConstants.MinPasswordLength} characters.");
+        if (!string.Equals(dto.Password, dto.ConfirmPassword, StringComparison.Ordinal))
+            throw new ValidationException("Password and confirm password must match.");
 
         var email = EmailNormalizer.Normalize(dto.Email);
         return (email, dto.Password);

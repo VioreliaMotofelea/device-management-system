@@ -32,7 +32,7 @@ public sealed class AuthValidationTests : IClassFixture<WebApplicationFactory<Pr
     public async Task Register_WithShortPassword_ReturnsBadRequest()
     {
         using var client = _factory.CreateClient();
-        var payload = new { email = "new.user@example.com", password = "123" };
+        var payload = new { email = "new.user@example.com", password = "123", confirmPassword = "123" };
 
         var response = await client.PostAsJsonAsync("/api/auth/register", payload);
 
@@ -40,5 +40,26 @@ public sealed class AuthValidationTests : IClassFixture<WebApplicationFactory<Pr
         var body = await response.Content.ReadAsStringAsync();
         using var doc = JsonDocument.Parse(body);
         Assert.Contains("Password must be at least", doc.RootElement.GetProperty("message").GetString());
+    }
+
+    [Fact]
+    public async Task Register_WithMismatchedConfirmPassword_ReturnsBadRequest()
+    {
+        using var client = _factory.CreateClient();
+        var payload = new
+        {
+            email = $"new.user.{Guid.NewGuid():N}@example.com",
+            password = "Password1",
+            confirmPassword = "Password2"
+        };
+
+        var response = await client.PostAsJsonAsync("/api/auth/register", payload);
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        var body = await response.Content.ReadAsStringAsync();
+        using var doc = JsonDocument.Parse(body);
+        Assert.Equal(
+            "Password and confirm password must match.",
+            doc.RootElement.GetProperty("message").GetString());
     }
 }

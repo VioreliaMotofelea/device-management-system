@@ -21,7 +21,8 @@ internal static class TestAuthHelper
         var registerResp = await client.PostAsJsonAsync("/api/auth/register", new
         {
             Email = email,
-            Password = password
+            Password = password,
+            ConfirmPassword = password
         });
         registerResp.EnsureSuccessStatusCode();
 

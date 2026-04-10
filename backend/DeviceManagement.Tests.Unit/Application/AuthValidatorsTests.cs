@@ -18,7 +18,8 @@ public sealed class AuthValidatorsTests
         Assert.Throws<ValidationException>(() => RegisterRequestValidator.Validate(new RegisterRequestDto
         {
             Email = " ",
-            Password = "Password1"
+            Password = "Password1",
+            ConfirmPassword = "Password1"
         }));
     }
 
@@ -42,9 +43,38 @@ public sealed class AuthValidatorsTests
             RegisterRequestValidator.Validate(new RegisterRequestDto
             {
                 Email = "user@example.com",
-                Password = "123"
+                Password = "123",
+                ConfirmPassword = "123"
             }));
 
         Assert.Contains("Password must be at least", ex.Message);
+    }
+
+    [Fact]
+    public void RegisterValidator_Throws_WhenConfirmPasswordMissing()
+    {
+        var ex = Assert.Throws<ValidationException>(() =>
+            RegisterRequestValidator.Validate(new RegisterRequestDto
+            {
+                Email = "user@example.com",
+                Password = "Password1",
+                ConfirmPassword = " "
+            }));
+
+        Assert.Equal("Confirm password is required.", ex.Message);
+    }
+
+    [Fact]
+    public void RegisterValidator_Throws_WhenPasswordAndConfirmDoNotMatch()
+    {
+        var ex = Assert.Throws<ValidationException>(() =>
+            RegisterRequestValidator.Validate(new RegisterRequestDto
+            {
+                Email = "user@example.com",
+                Password = "Password1",
+                ConfirmPassword = "Password2"
+            }));
+
+        Assert.Equal("Password and confirm password must match.", ex.Message);
     }
 }

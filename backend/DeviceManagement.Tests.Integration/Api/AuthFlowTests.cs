@@ -24,7 +24,8 @@ public sealed class AuthFlowTests : IClassFixture<WebApplicationFactory<Program>
         var registerResp = await client.PostAsJsonAsync("/api/auth/register", new
         {
             Email = email,
-            Password = password
+            Password = password,
+            ConfirmPassword = password
         });
         registerResp.EnsureSuccessStatusCode();
 
@@ -50,14 +51,16 @@ public sealed class AuthFlowTests : IClassFixture<WebApplicationFactory<Program>
         var first = await client.PostAsJsonAsync("/api/auth/register", new
         {
             Email = email,
-            Password = password
+            Password = password,
+            ConfirmPassword = password
         });
         first.EnsureSuccessStatusCode();
 
         var second = await client.PostAsJsonAsync("/api/auth/register", new
         {
             Email = email,
-            Password = password
+            Password = password,
+            ConfirmPassword = password
         });
 
         Assert.Equal(HttpStatusCode.Conflict, second.StatusCode);

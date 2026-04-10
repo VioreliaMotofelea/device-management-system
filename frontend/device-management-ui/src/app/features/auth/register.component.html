@@ -30,6 +30,30 @@
         }
       </label>
 
+      <label class="field">
+        <span>Confirm password</span>
+        <input
+          type="password"
+          formControlName="confirmPassword"
+          autocomplete="new-password"
+        />
+        @if (
+          form.controls.confirmPassword.touched &&
+          form.controls.confirmPassword.invalid
+        ) {
+          <span class="field-error">
+            Confirm password is required (min {{ minPasswordLength }} characters).
+          </span>
+        }
+      </label>
+
+      @if (
+        form.hasError('passwordMismatch') &&
+        (form.controls.password.touched || form.controls.confirmPassword.touched)
+      ) {
+        <span class="field-error">Password and confirm password must match.</span>
+      }
+
       <button
         type="submit"
         class="dm-btn dm-btn--primary auth-submit"

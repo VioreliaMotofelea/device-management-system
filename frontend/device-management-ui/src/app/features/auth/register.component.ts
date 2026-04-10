@@ -1,7 +1,9 @@
 import { Component, inject, signal } from '@angular/core';
 import {
+  AbstractControl,
   NonNullableFormBuilder,
   ReactiveFormsModule,
+  ValidationErrors,
   Validators,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -24,10 +26,17 @@ export class RegisterComponent {
   protected readonly submitting = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
 
-  protected readonly form = this.fb.group({
-    email: ['', [Validators.required, Validators.email]],
-    password: ['', [Validators.required, Validators.minLength(this.minPasswordLength)]],
-  });
+  protected readonly form = this.fb.group(
+    {
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(this.minPasswordLength)]],
+      confirmPassword: [
+        '',
+        [Validators.required, Validators.minLength(this.minPasswordLength)],
+      ],
+    },
+    { validators: RegisterComponent.passwordsMatchValidator },
+  );
 
   protected submit(): void {
     this.errorMessage.set(null);
@@ -37,9 +46,11 @@ export class RegisterComponent {
     }
 
     this.submitting.set(true);
-    const { email, password } = this.form.getRawValue();
+    const { email, password, confirmPassword } = this.form.getRawValue();
 
-    this.auth.register({ email: email.trim(), password }).subscribe({
+    this.auth
+      .register({ email: email.trim(), password, confirmPassword })
+      .subscribe({
       next: async () => {
         this.submitting.set(false);
         await this.router.navigateByUrl('/devices');
@@ -50,6 +61,21 @@ export class RegisterComponent {
           getApiErrorMessage(err, 'Registration failed. Try again.'),
         );
       },
-    });
+      });
+  }
+
+  private static passwordsMatchValidator(
+    control: AbstractControl,
+  ): ValidationErrors | null {
+    const password = control.get('password')?.value as string | undefined;
+    const confirmPassword = control.get('confirmPassword')?.value as
+      | string
+      | undefined;
+
+    if (!password || !confirmPassword) {
+      return null;
+    }
+
+    return password === confirmPassword ? null : { passwordMismatch: true };
   }
 }
