@@ -3,15 +3,14 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using DeviceManagement.Tests.Integration.Fixtures;
-using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace DeviceManagement.Tests.Integration.Api;
 
-public sealed class UsersCrudHappyPathTests : IClassFixture<WebApplicationFactory<Program>>
+public sealed class UsersCrudHappyPathTests : IClassFixture<CustomWebApplicationFactory>
 {
-    private readonly WebApplicationFactory<Program> _factory;
+    private readonly CustomWebApplicationFactory _factory;
 
-    public UsersCrudHappyPathTests(WebApplicationFactory<Program> factory)
+    public UsersCrudHappyPathTests(CustomWebApplicationFactory factory)
     {
         _factory = factory;
     }

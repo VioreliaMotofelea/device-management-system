@@ -19,7 +19,8 @@ public sealed class AuthServiceTests
         var response = await sut.RegisterAsync(new RegisterRequestDto
         {
             Email = "  New.User@Example.com ",
-            Password = "Password1"
+            Password = "Password1",
+            ConfirmPassword = "Password1"
         });
 
         Assert.Equal("token-for-new.user@example.com", response.AccessToken);
@@ -36,7 +37,8 @@ public sealed class AuthServiceTests
         await Assert.ThrowsAsync<ConflictException>(() => sut.RegisterAsync(new RegisterRequestDto
         {
             Email = "test@example.com",
-            Password = "Password1"
+            Password = "Password1",
+            ConfirmPassword = "Password1"
         }));
     }
 

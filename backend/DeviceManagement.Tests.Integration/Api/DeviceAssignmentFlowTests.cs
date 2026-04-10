@@ -1,15 +1,14 @@
 using System.Net;
 using System.Net.Http.Headers;
 using DeviceManagement.Tests.Integration.Fixtures;
-using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace DeviceManagement.Tests.Integration.Api;
 
-public sealed class DeviceAssignmentFlowTests : IClassFixture<WebApplicationFactory<Program>>
+public sealed class DeviceAssignmentFlowTests : IClassFixture<CustomWebApplicationFactory>
 {
-    private readonly WebApplicationFactory<Program> _factory;
+    private readonly CustomWebApplicationFactory _factory;
 
-    public DeviceAssignmentFlowTests(WebApplicationFactory<Program> factory)
+    public DeviceAssignmentFlowTests(CustomWebApplicationFactory factory)
     {
         _factory = factory;
     }

@@ -1,13 +1,13 @@
 using System.Net;
-using Microsoft.AspNetCore.Mvc.Testing;
+using DeviceManagement.Tests.Integration.Fixtures;
 
 namespace DeviceManagement.Tests.Integration.Api;
 
-public sealed class DevicesEndpointAuthTests : IClassFixture<WebApplicationFactory<Program>>
+public sealed class DevicesEndpointAuthTests : IClassFixture<CustomWebApplicationFactory>
 {
-    private readonly WebApplicationFactory<Program> _factory;
+    private readonly CustomWebApplicationFactory _factory;
 
-    public DevicesEndpointAuthTests(WebApplicationFactory<Program> factory)
+    public DevicesEndpointAuthTests(CustomWebApplicationFactory factory)
     {
         _factory = factory;
     }
